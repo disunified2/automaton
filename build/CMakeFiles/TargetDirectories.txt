@@ -1,0 +1,3 @@
+/Users/tdelaroche/Documents/Fac/L3/S5/TL/2025/automaton/build/CMakeFiles/testfa.dir
+/Users/tdelaroche/Documents/Fac/L3/S5/TL/2025/automaton/build/CMakeFiles/edit_cache.dir
+/Users/tdelaroche/Documents/Fac/L3/S5/TL/2025/automaton/build/CMakeFiles/rebuild_cache.dir
