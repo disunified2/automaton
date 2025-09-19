@@ -6,6 +6,9 @@
 #include <set>
 #include <string>
 
+#include <map>
+#include <unordered_set>
+
 
 namespace fa {
 
@@ -224,6 +227,21 @@ namespace fa {
 
 
   private:
+
+    /**
+       * Go through a graph
+       */
+    bool depthFirstSearch(const int &initial, std::unordered_set<int> &visited, bool return_) const;
+
+    struct State {
+      int state;
+      bool isFinal;
+      bool isInitial;
+      std::map<char, std::map<int, State>> transitions;
+    };
+
+    std::map<int, State> states;
+    std::set<char> symbols;
   };
 
 }
