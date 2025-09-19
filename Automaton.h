@@ -227,7 +227,6 @@ namespace fa {
 
 
   private:
-
     /**
        * Go through a graph
        */
@@ -242,6 +241,13 @@ namespace fa {
 
     std::map<int, State> states;
     std::set<char> symbols;
+
+    /**
+     * Fonctionnement de la structure :
+     *  Un automate contient une map de States
+     *  -> Chaque state connait ses propres transitions vers d'autres states
+     *  Il y a également une liste des symboles que l'automate sait reconnaître
+     */
   };
 
 }
