@@ -11,7 +11,5 @@ namespace fa {
   bool Automaton::isValid() const {
     return true;
   }
-
-
 }
 

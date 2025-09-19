@@ -3,9 +3,334 @@
 
 #include "Automaton.h"
 
+// Example test
 TEST(AutomatonExampleTest, Default) {
   fa::Automaton fa;
   EXPECT_FALSE(fa.isValid());
+}
+
+// isValid() tests
+TEST(AutomatonIsValidTest, emptyStates) {
+  fa::Automaton fa;
+  fa.addSymbol('a');
+  EXPECT_FALSE(fa.isValid());
+}
+TEST(AutomatonIsValidTest, emptySymbols) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_FALSE(fa.isValid());
+}
+TEST(AutomatonIsValidTest, valid) {
+  fa::Automaton fa;
+  fa.addSymbol('a');
+  fa.addState(0);
+  EXPECT_TRUE(fa.isValid());
+}
+
+// Tests for addSymbol()
+TEST(AutomatonAddSymbolTest, epsilon) {
+  fa::Automaton fa;
+  EXPECT_FALSE(fa.addSymbol(fa::Epsilon));
+  EXPECT_EQ(fa.countSymbols(), 0u);
+}
+TEST(AutomatonAddSymbolTest, invalidSymbol) {
+  fa::Automaton fa;
+  EXPECT_FALSE(fa.addSymbol('\t'));
+  EXPECT_EQ(fa.countSymbols(), 0u);
+}
+TEST(AutomatonAddSymbolTest, validSymbol) {
+  fa::Automaton fa;
+  EXPECT_TRUE(fa.addSymbol('a'));
+  EXPECT_EQ(fa.countSymbols(), 1u);
+}
+TEST(AutomatonAddSymbolTest, duplicateValidSymbol) {
+  fa::Automaton fa;
+  EXPECT_TRUE(fa.addSymbol('a'));
+  EXPECT_FALSE(fa.addSymbol('a'));
+  EXPECT_EQ(fa.countSymbols(), 1u);
+}
+TEST(AutomatonAddSymbolTest, multipleValidSymbols) {
+  fa::Automaton fa;
+  EXPECT_TRUE(fa.addSymbol('a'));
+  EXPECT_TRUE(fa.addSymbol('b'));
+  EXPECT_TRUE(fa.addSymbol('c'));
+  EXPECT_EQ(fa.countSymbols(), 3u);
+}
+TEST(AutomatonAddSymbolTest, mixedSymbols) {
+  fa::Automaton fa;
+  EXPECT_TRUE(fa.addSymbol('a'));
+  EXPECT_FALSE(fa.addSymbol(fa::Epsilon));
+  EXPECT_TRUE(fa.addSymbol('b'));
+  EXPECT_EQ(fa.countSymbols(), 2u);
+}
+
+// Tests for removeSymbol()
+TEST(AutomatonRemoveSymbolTest, epsilon) {
+  fa::Automaton fa;
+  EXPECT_FALSE(fa.removeSymbol(fa::Epsilon));
+}
+TEST(AutomatonRemoveSymbolTest, noSymbols) {
+  fa::Automaton fa;
+  EXPECT_FALSE(fa.removeSymbol('a'));
+}
+TEST(AutomatonRemoveSymbolTest, nonExistentSymbol) {
+  fa::Automaton fa;
+  fa.addSymbol('a');
+  EXPECT_FALSE(fa.removeSymbol('b'));
+  EXPECT_EQ(fa.countSymbols(), 1u);
+}
+TEST(AutomatonRemoveSymbolTest, invalidSymbol) {
+  fa::Automaton fa;
+  EXPECT_FALSE(fa.removeSymbol('\t'));
+}
+TEST(AutomatonRemoveSymbolTest, symbolPresent) {
+  fa::Automaton fa;
+  fa.addSymbol('a');
+  EXPECT_TRUE(fa.removeSymbol('a'));
+  EXPECT_EQ(fa.countSymbols(), 0u);
+}
+TEST(AutomatonRemoveSymbolTest, duplicateSymbol) {
+  fa::Automaton fa;
+  fa.addSymbol('a');
+  EXPECT_TRUE(fa.removeSymbol('a'));
+  EXPECT_FALSE(fa.removeSymbol('a'));
+}
+TEST(AutomatonRemoveSymbolTest, multipleSymbols) {
+  fa::Automaton fa;
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addSymbol('c');
+  EXPECT_TRUE(fa.removeSymbol('a'));
+  EXPECT_TRUE(fa.removeSymbol('b'));
+  EXPECT_TRUE(fa.removeSymbol('c'));
+  EXPECT_EQ(fa.countSymbols(), 0u);
+}
+TEST(AutomatonRemoveSymbolTest, symbolInTransition) {
+  fa::Automaton fa;
+  fa.addSymbol('a');
+  fa.addState(0);
+  fa.addTransition(0, 'a', 0);
+  EXPECT_TRUE(fa.removeSymbol('a'));
+  EXPECT_FALSE(fa.hasTransition(0, 'a', 0));
+  EXPECT_EQ(fa.countSymbols(), 0u);
+  EXPECT_FALSE(fa.hasTransition(0, 'a', 0));
+}
+
+// Tests for hasSymbol()
+TEST(AutomatonHasSymbolTest, noSymbols) {
+  fa::Automaton fa;
+  EXPECT_FALSE(fa.hasSymbol('a'));
+}
+TEST(AutomatonHasSymbolTest, epsilon) {
+  fa::Automaton fa;
+  EXPECT_FALSE(fa.hasSymbol(fa::Epsilon));
+}
+TEST(AutomatonHasSymbolTest, symbolPresent) {
+  fa::Automaton fa;
+  fa.addSymbol('a');
+  EXPECT_TRUE(fa.hasSymbol('a'));
+}
+
+// Tests for countSymbols()
+TEST(AutomatonCountSymbolsTest, noSymbols) {
+  fa::Automaton fa;
+  EXPECT_EQ(fa.countSymbols(), 0u);
+}
+TEST(AutomatonCountSymbolsTest, oneSymbol) {
+  fa::Automaton fa;
+  fa.addSymbol('a');
+  EXPECT_EQ(fa.countSymbols(), 1u);
+}
+TEST(AutomatonCountSymbolsTest, multipleSymbols) {
+  fa::Automaton fa;
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addSymbol('c');
+  EXPECT_EQ(fa.countSymbols(), 3u);
+}
+
+// Tests for addState()
+TEST(AutomatonAddStateTest, stateNotPresent) {
+  fa::Automaton fa;
+  EXPECT_TRUE(fa.addState(0));
+  EXPECT_EQ(fa.countStates(), 1u);
+}
+TEST(AutomatonAddStateTest, stateAlreadyPresent) {
+  fa::Automaton fa;
+  EXPECT_TRUE(fa.addState(0));
+  EXPECT_FALSE(fa.addState(0));
+  EXPECT_EQ(fa.countStates(), 1u);
+}
+TEST(AutomatonAddStateTest, negativeState) {
+  fa::Automaton fa;
+  EXPECT_FALSE(fa.addState(-1));
+  EXPECT_EQ(fa.countStates(), 0u);
+}
+TEST(AutomatonAddStateTest, multipleStates) {
+  fa::Automaton fa;
+  EXPECT_TRUE(fa.addState(0));
+  EXPECT_TRUE(fa.addState(1));
+  EXPECT_TRUE(fa.addState(2));
+  EXPECT_EQ(fa.countStates(), 3u);
+}
+
+// Tests for removeState()
+TEST(AutomatonRemoveStateTest, stateNotPresent) {
+  fa::Automaton fa;
+  EXPECT_FALSE(fa.removeState(0));
+}
+TEST(AutomatonRemoveStateTest, negativeState) {
+  fa::Automaton fa;
+  EXPECT_FALSE(fa.removeState(-1));
+}
+TEST(AutomatonRemoveStateTest, statePresent) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_TRUE(fa.removeState(0));
+  EXPECT_EQ(fa.countStates(), 0u);
+}
+TEST(AutomatonRemoveStateTest, multipleStates) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  EXPECT_TRUE(fa.removeState(1));
+  EXPECT_TRUE(fa.removeState(0));
+  EXPECT_EQ(fa.countStates(), 0u);
+}
+TEST(AutomatonRemoveStateTest, stateInTransition) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  EXPECT_TRUE(fa.removeState(0));
+  EXPECT_TRUE(fa.hasSymbol('a'));
+  EXPECT_EQ(fa.countStates(), 0u);
+  EXPECT_FALSE(fa.hasTransition(0, 'a', 0));
+}
+
+// Tests for hasState()
+TEST(AutomatonHasStateTest, noStates) {
+  fa::Automaton fa;
+  EXPECT_FALSE(fa.hasState(0));
+}
+TEST(AutomatonHasStateTest, stateNotPresent) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_FALSE(fa.hasState(1));
+  EXPECT_EQ(fa.countStates(), 1u);
+}
+TEST(AutomatonHasStateTest, statePresent) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_TRUE(fa.hasState(0));
+  EXPECT_EQ(fa.countStates(), 1u);
+}
+
+// Tests for countStates()
+TEST(AutomatonCountStatesTest, noStates) {
+  fa::Automaton fa;
+  EXPECT_EQ(fa.countStates(), 0u);
+}
+TEST(AutomatonCountStatesTest, duplicate) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(0);
+  EXPECT_EQ(fa.countStates(), 1u);
+}
+TEST(AutomatonCountStatesTest, multiple) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  EXPECT_EQ(fa.countStates(), 3u);
+}
+TEST(AutomatonCountStatesTest, single) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_EQ(fa.countStates(), 1u);
+}
+TEST(AutomatonCountStatesTest, lotsOfStates) {
+  fa::Automaton fa;
+  for (int i=0; i < 1000; ++i) {
+    EXPECT_TRUE(fa.addState(i));
+  }
+  EXPECT_EQ(fa.countStates(), 1000u);
+}
+
+// Tests for setStateInitial()
+TEST(AutomatonSetStateInitialTest, stateNotAlreadyInitial) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_FALSE(fa.isStateInitial(0));
+  fa.setStateInitial(0);
+  EXPECT_TRUE(fa.isStateInitial(0));
+}
+TEST(AutomatonSetStateInitialTest, stateAlreadyInitial) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.setStateInitial(0);
+  EXPECT_TRUE(fa.isStateInitial(0));
+  fa.setStateInitial(0);
+  EXPECT_TRUE(fa.isStateInitial(0));
+}
+
+// Tests for isStateInitial()
+TEST(AutomatonIsStateInitialTest, emptyStates) {
+  fa::Automaton fa;
+  EXPECT_FALSE(fa.isStateInitial(0));
+}
+TEST(AutomatonIsStateInitialTest, stateNotPresent) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_FALSE(fa.isStateInitial(1));
+}
+TEST(AutomatonIsStateInitialTest, stateNotInitial) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_FALSE(fa.isStateInitial(0));
+}
+TEST(AutomatonIsStateInitialTest, stateIsInitial) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.setStateInitial(0);
+  EXPECT_TRUE(fa.isStateInitial(0));
+}
+
+// Tests for setStateFinal()
+TEST(AutomatonSetStateFinalTest, stateNotAlreadyFinal) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_FALSE(fa.isStateFinal(0));
+}
+TEST(AutomatonSetStateFinalTest, stateAlreadyFinal) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.setStateFinal(0);
+  EXPECT_TRUE(fa.isStateFinal(0));
+  fa.setStateFinal(0);
+  EXPECT_TRUE(fa.isStateFinal(0));
+}
+
+// Tests for isStateFinal()
+TEST(AutomatonIsStateFinalTest, noStates) {
+  fa::Automaton fa;
+  EXPECT_FALSE(fa.isStateFinal(0));
+}
+TEST(AutomatonIsStateFinalTest, stateNotPresent) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_FALSE(fa.isStateFinal(1));
+}
+TEST(AutomatonIsStateFinalTest, stateNotFinal) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_FALSE(fa.isStateFinal(0));
+}
+TEST(AutomatonIsStateFinalTest, stateIsFinal) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.setStateFinal(0);
+  EXPECT_TRUE(fa.isStateFinal(0));
 }
 
 int main(int argc, char **argv) {
