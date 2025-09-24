@@ -114,6 +114,7 @@ TEST(AutomatonRemoveSymbolTest, symbolInTransition) {
   EXPECT_FALSE(fa.hasTransition(0, 'a', 0));
   EXPECT_EQ(fa.countSymbols(), 0u);
   EXPECT_FALSE(fa.hasTransition(0, 'a', 0));
+  EXPECT_EQ(fa.countTransitions(), 0u);
 }
 
 // Tests for hasSymbol()
@@ -206,6 +207,7 @@ TEST(AutomatonRemoveStateTest, stateInTransition) {
   EXPECT_TRUE(fa.hasSymbol('a'));
   EXPECT_EQ(fa.countStates(), 0u);
   EXPECT_FALSE(fa.hasTransition(0, 'a', 0));
+  EXPECT_EQ(fa.countTransitions(), 0u);
 }
 
 // Tests for hasState()
@@ -332,6 +334,242 @@ TEST(AutomatonIsStateFinalTest, stateIsFinal) {
   fa.setStateFinal(0);
   EXPECT_TRUE(fa.isStateFinal(0));
 }
+
+// Tests for addTransition()
+TEST(AutomatonAddTransitionTest, invalidChar) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_FALSE(fa.addTransition(0, '\t', 0));
+  EXPECT_EQ(fa.countTransitions(), 0u);
+}
+TEST(AutomatonAddTransitionTest, charNonExistant) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_FALSE(fa.addTransition(0, 'a', 0));
+  EXPECT_EQ(fa.countTransitions(), 0u);
+}
+TEST(AutomatonAddTransitionTest, fromNonExistant) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_FALSE(fa.addTransition(1, 'a', 0));
+  EXPECT_EQ(fa.countTransitions(), 0u);
+}
+TEST(AutomatonAddTransitionTest, toNonExistant) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_FALSE(fa.addTransition(0, 'a', 1));
+  EXPECT_EQ(fa.countTransitions(), 0u);
+}
+TEST(AutomatonAddTransitionTest, transitionToSelf) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  EXPECT_TRUE(fa.addTransition(0, 'a', 0));
+  EXPECT_EQ(fa.countTransitions(), 1u);
+}
+TEST(AutomatonAddTransitionTest, validTransition) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  EXPECT_TRUE(fa.addTransition(0, 'a', 1));
+  EXPECT_EQ(fa.countTransitions(), 1u);
+}
+TEST(AutomatonAddTransitionTest, sameStateDiffArrival) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.addSymbol('a');
+  EXPECT_TRUE(fa.addTransition(0, 'a', 1));
+  EXPECT_TRUE(fa.addTransition(0, 'a', 2));
+  EXPECT_EQ(fa.countTransitions(), 2u);
+}
+TEST(AutomatonAddTransitionTest, epsilonTransition) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_TRUE(fa.addTransition(0, fa::Epsilon, 1));
+  EXPECT_EQ(fa.countTransitions(), 1u);
+}
+TEST(AutomatonAddTransitionTest, epsilonTransitionToSelf) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_TRUE(fa.addTransition(0, fa::Epsilon, 0));
+}
+
+// Tests for removeTransition()
+TEST(AutomatonRemoveTransitionTest, charNotInAutomaton) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_FALSE(fa.removeTransition(0, 'a', 0));
+}
+TEST(AutomatonRemoveTransitionTest, stateNotInAutomaton) {
+  fa::Automaton fa;
+  fa.addSymbol('a');
+  EXPECT_FALSE(fa.removeTransition(0, 'a', 0));
+}
+TEST(AutomatonRemoveTransitionTest, charNotInTransition) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  EXPECT_FALSE(fa.removeTransition(0, 'b', 0));
+  EXPECT_EQ(fa.countTransitions(), 1u);
+}
+TEST(AutomatonRemoveTransitionTest, toNonExistant) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  EXPECT_FALSE(fa.removeTransition(0, 'a', 1));
+  EXPECT_EQ(fa.countTransitions(), 1u);
+}
+TEST(AutomatonRemoveTransitionTest, validTransition) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  EXPECT_TRUE(fa.removeTransition(0, 'a', 0));
+  EXPECT_EQ(fa.countTransitions(), 0u);
+}
+TEST(AutomatonRemoveTransitionTest, lastTransitionRemaining) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  fa.addTransition(0, 'a', 1);
+  EXPECT_EQ(fa.countTransitions(), 2u);
+  EXPECT_TRUE(fa.removeTransition(0, 'a', 0));
+  EXPECT_EQ(fa.countTransitions(), 1u);
+  EXPECT_TRUE(fa.removeTransition(0, 'a', 1));
+  EXPECT_EQ(fa.countTransitions(), 0u);
+}
+TEST(AutomatonRemoveTransitionTest, epsilonTransition) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addTransition(0, fa::Epsilon, 0);
+  EXPECT_TRUE(fa.removeTransition(0, fa::Epsilon, 0));
+  EXPECT_EQ(fa.countTransitions(), 0u);
+}
+
+// Tests for hasTransition()
+TEST(AutomatonHasTransitionTest, invalidChar) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_FALSE(fa.hasTransition(0, '\t', 0));
+}
+TEST(AutomatonHasTransitionTest, charNonExistant) {
+  fa::Automaton fa;
+  fa.addState(0);
+  EXPECT_FALSE(fa.hasTransition(0, 'a', 0));
+}
+TEST(AutomatonHasTransitionTest, fromNonExistant) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  EXPECT_FALSE(fa.hasTransition(1, 'a', 0));
+}
+TEST(AutomatonHasTransitionTest, toDoesNotExist) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  EXPECT_FALSE(fa.hasTransition(0, 'a', 1));
+}
+TEST(AutomatonHasTransitionTest, transitionDoesNotExist) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'a', 0);
+  fa.addTransition(0, 'b', 1);
+  EXPECT_FALSE(fa.hasTransition(0, 'a', 1));
+}
+TEST(AutomatonHasTransitionTest, epsilonTransition) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addTransition(0, fa::Epsilon, 0);
+  EXPECT_TRUE(fa.hasTransition(0, fa::Epsilon, 0));
+}
+TEST(AutomatonHasTransitionTest, validTransition) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  EXPECT_TRUE(fa.hasTransition(0, 'a', 0));
+}
+TEST(AutomatonHasTransitionTest, deletedState) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  EXPECT_TRUE(fa.hasTransition(0, 'a', 1));
+  fa.removeState(1);
+  EXPECT_FALSE(fa.hasTransition(0, 'a', 1));
+  EXPECT_EQ(fa.countTransitions(), 0u);
+}
+TEST(AutomatonHasTransitionTest, backwardsTransition) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  EXPECT_TRUE(fa.hasTransition(0, 'a', 1));
+  EXPECT_FALSE(fa.hasTransition(1, 'a', 0));
+}
+
+// Tests for countTransitions()
+TEST(AutomatonCountTransitionsTest, emptyAutomaton) {
+  fa::Automaton fa;
+  EXPECT_EQ(fa.countTransitions(), 0u);
+}
+TEST(AutomatonCountTransitionsTest, noTransitions) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  EXPECT_EQ(fa.countTransitions(), 0u);
+}
+TEST(AutomatonCountTransitionsTest, validTransition) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  EXPECT_TRUE(fa.hasTransition(0, 'a', 1));
+  EXPECT_EQ(fa.countTransitions(), 1u);
+}
+TEST(AutomatonCountTransitionsTest, validTransitionToSelf) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  EXPECT_TRUE(fa.hasTransition(0, 'a', 0));
+  EXPECT_EQ(fa.countTransitions(), 1u);
+}
+TEST(AutomatonCountTransitionsTest, multipleTransitionsSameSymbol) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  fa.addTransition(0, 'a', 1);
+  EXPECT_EQ(fa.countTransitions(), 2u);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
