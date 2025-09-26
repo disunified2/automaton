@@ -113,7 +113,6 @@ TEST(AutomatonRemoveSymbolTest, symbolInTransition) {
   EXPECT_TRUE(fa.removeSymbol('a'));
   EXPECT_FALSE(fa.hasTransition(0, 'a', 0));
   EXPECT_EQ(fa.countSymbols(), 0u);
-  EXPECT_FALSE(fa.hasTransition(0, 'a', 0));
   EXPECT_EQ(fa.countTransitions(), 0u);
 }
 
