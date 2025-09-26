@@ -60,7 +60,18 @@ namespace fa {
   }
 
   bool Automaton::removeState(int state) {
-    return true;
+    if (states.find(state) == states.end()) {
+      return false;
+    }
+    // removing the transitions with state
+    for (auto state1 : states) {
+      for (auto transition : state1.second.transitions) {
+        for (auto state2 : transition.second) {
+          removeTransition(state1.first, transition.first, state);
+        }
+      }
+    }
+    return states.erase(state);
   }
 
   bool Automaton::hasState(int state) const {
@@ -72,19 +83,25 @@ namespace fa {
   }
 
   void Automaton::setStateInitial(int state) {
-
+    states.find(state)->second.isInitial = true;
   }
 
   bool Automaton::isStateInitial(int state) const {
-    return true;
+    if (states.find(state) == states.end()) {
+      return false;
+    }
+    return states.at(state).isInitial;
   }
 
   void Automaton::setStateFinal(int state) {
-
+    states.find(state)->second.isFinal = true;
   }
 
   bool Automaton::isStateFinal(int state) const {
-    return true;
+    if (states.find(state) == states.end()) {
+      return false;
+    }
+    return states.at(state).isFinal;
   }
 
   bool Automaton::addTransition(int from, char alpha, int to) {
