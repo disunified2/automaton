@@ -197,15 +197,28 @@ TEST(AutomatonRemoveStateTest, multipleStates) {
   EXPECT_TRUE(fa.removeState(0));
   EXPECT_EQ(fa.countStates(), 0u);
 }
-TEST(AutomatonRemoveStateTest, stateInTransition) {
+TEST(AutomatonRemoveStateTest, stateInTransitionFrom) {
   fa::Automaton fa;
   fa.addState(0);
+  fa.addState(1);
   fa.addSymbol('a');
-  fa.addTransition(0, 'a', 0);
+  fa.addTransition(0, 'a', 1);
   EXPECT_TRUE(fa.removeState(0));
   EXPECT_TRUE(fa.hasSymbol('a'));
-  EXPECT_EQ(fa.countStates(), 0u);
-  EXPECT_FALSE(fa.hasTransition(0, 'a', 0));
+  EXPECT_EQ(fa.countStates(), 1u);
+  EXPECT_FALSE(fa.hasTransition(0, 'a', 1));
+  EXPECT_EQ(fa.countTransitions(), 0u);
+}
+TEST(AutomatonRemoveStateTest, stateInTransitionTo) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  EXPECT_TRUE(fa.removeState(1));
+  EXPECT_TRUE(fa.hasSymbol('a'));
+  EXPECT_EQ(fa.countStates(), 1u);
+  EXPECT_FALSE(fa.hasTransition(0, 'a', 1));
   EXPECT_EQ(fa.countTransitions(), 0u);
 }
 
