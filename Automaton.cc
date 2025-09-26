@@ -1,5 +1,7 @@
 #include "Automaton.h"
 
+#include <utility>
+
 
 namespace fa {
 
@@ -9,27 +11,52 @@ namespace fa {
   }
 
   bool Automaton::isValid() const {
-    return true;
+    return (countStates() != 0 && countSymbols() != 0);
   }
 
   bool Automaton::addSymbol(char symbol) {
-    return true;
+    if (!isgraph(symbol)) {
+      return false;
+    }
+    return symbols.insert(symbol).second;
   }
 
   bool Automaton::removeSymbol(char symbol) {
-    return true;
+    // le symbole n'est pas dans l'automate
+    if (symbols.find(symbol) == symbols.end()) {
+      return false;
+    }
+    // parcours des transitions pour supprimer les transitions concernées
+    for (const auto& state : states) { // Parcours des états
+      for (const auto& transition : state.second.transitions) {
+        for (auto state2 : transition.second) {
+          removeTransition(state.first, symbol, state.first);
+        }
+      }
+    }
+    return symbols.erase(symbol);
   }
 
   bool Automaton::hasSymbol(char symbol) const {
-    return true;
+    return symbols.find(symbol) != symbols.end();
   }
 
   std::size_t Automaton::countSymbols() const {
-    return 0;
+    return symbols.size();
   }
 
   bool Automaton::addState(int state) {
-    return true;
+    if (state < 0) {
+      return false;
+    }
+
+    State st;
+    st.state = state;
+    st.isFinal = false;
+    st.isInitial = false;
+    st.transitions = {};
+
+    return states.insert(std::pair<int, State>(state, st)).second;
   }
 
   bool Automaton::removeState(int state) {
@@ -37,11 +64,11 @@ namespace fa {
   }
 
   bool Automaton::hasState(int state) const {
-    return true;
+    return states.find(state) != states.end();
   }
 
   std::size_t Automaton::countStates() const {
-    return 0;
+    return states.size();
   }
 
   void Automaton::setStateInitial(int state) {
