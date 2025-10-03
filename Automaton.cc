@@ -1,7 +1,9 @@
 #include "Automaton.h"
 
-#include <utility>
-
+#include <cassert>
+#include <iostream>
+#include <list>
+#include <ostream>
 
 namespace fa {
 
@@ -14,6 +16,8 @@ namespace fa {
     return (countStates() != 0 && countSymbols() != 0);
   }
 
+
+
   bool Automaton::addSymbol(char symbol) {
     if (!isgraph(symbol)) {
       return false;
@@ -22,15 +26,14 @@ namespace fa {
   }
 
   bool Automaton::removeSymbol(char symbol) {
-    // le symbole n'est pas dans l'automate
     if (symbols.find(symbol) == symbols.end()) {
       return false;
     }
-    // parcours des transitions pour supprimer les transitions concernées
-    for (const auto& state : states) { // Parcours des états
-      for (const auto& transition : state.second.transitions) {
-        for (auto state2 : transition.second) {
-          removeTransition(state.first, symbol, state.first);
+    // Suppression de toute transition qui contient symbol
+    for (auto it : states) {
+      for (auto it2 : it.second.transitions) {
+        for (auto it3 : it2.second) {
+          removeTransition(it.first, symbol, it3.first);
         }
       }
     }
@@ -45,6 +48,8 @@ namespace fa {
     return symbols.size();
   }
 
+
+
   bool Automaton::addState(int state) {
     if (state < 0) {
       return false;
@@ -56,18 +61,20 @@ namespace fa {
     st.isInitial = false;
     st.transitions = {};
 
-    return states.insert(std::pair<int, State>(state, st)).second;
+    if(!states.insert(std::pair<int, State>(state, st)).second) {
+      return false;
+    };
+    return true;
   }
 
   bool Automaton::removeState(int state) {
     if (states.find(state) == states.end()) {
       return false;
     }
-    // removing the transitions with state
-    for (auto state1 : states) {
-      for (auto transition : state1.second.transitions) {
-        for (auto state2 : transition.second) {
-          removeTransition(state1.first, transition.first, state);
+    for (auto it : states) {
+      for (auto it2 : it.second.transitions) {
+        for (auto it3 : it2.second) {
+          removeTransition(it.first, it2.first, state);
         }
       }
     }
@@ -104,20 +111,53 @@ namespace fa {
     return states.at(state).isFinal;
   }
 
+
+
   bool Automaton::addTransition(int from, char alpha, int to) {
+    if (!hasState(from) || !hasState(to) || (!hasSymbol(alpha) && alpha != fa::Epsilon)) {
+      return false;
+    }
+    if (!states[from].transitions[alpha].insert(std::pair<int, State>(to, states[to])).second) {
+      return false;
+    }
     return true;
   }
 
   bool Automaton::removeTransition(int from, char alpha, int to) {
+    if (!hasState(from) || !hasState(to) || (!hasSymbol(alpha) && alpha != fa::Epsilon)) {
+      return false;
+    }
+    if (!hasTransition(from, alpha, to)) {
+      return false;
+    }
+    states[from].transitions[alpha].erase(to);
+    if (states[from].transitions[alpha].empty()) {
+      states[from].transitions.erase(alpha);
+    }
     return true;
   }
 
   bool Automaton::hasTransition(int from, char alpha, int to) const {
+    if (!hasState(from) || !hasState(to) || (!hasSymbol(alpha) && alpha != fa::Epsilon)) {
+      return false;
+    }
+    if (states.find(from)->second.transitions.find(alpha)->first != alpha) {
+      return false;
+    }
+    if (states.find(from)->second.transitions.find(alpha)->second.find(to) == states.find(from)->second.transitions.find(alpha)->second.end()) {
+      return false;
+    }
     return true;
   }
 
   std::size_t Automaton::countTransitions() const {
-    return 0;
+    std::size_t nbTransitions = 0;
+    for (auto it = states.begin(); it != states.end(); ++it) {
+      for (auto it2 = it->second.transitions.begin(); it2 != it->second.transitions.end(); ++it2) {
+        nbTransitions += it2->second.size();
+      }
+    }
+    return nbTransitions;
   }
 
   void Automaton::prettyPrint(std::ostream &os) const {

@@ -400,6 +400,7 @@ TEST(AutomatonAddTransitionTest, sameStateDiffArrival) {
 TEST(AutomatonAddTransitionTest, epsilonTransition) {
   fa::Automaton fa;
   fa.addState(0);
+  fa.addState(1);
   EXPECT_TRUE(fa.addTransition(0, fa::Epsilon, 1));
   EXPECT_EQ(fa.countTransitions(), 1u);
 }
@@ -436,11 +437,11 @@ TEST(AutomatonRemoveTransitionTest, toNonExistant) {
   EXPECT_FALSE(fa.removeTransition(0, 'a', 1));
   EXPECT_EQ(fa.countTransitions(), 1u);
 }
-TEST(AutomatonRemoveTransitionTest, validTransition) {
+TEST(AutomatonRemoveTransitionTest, plausibleTransition) {
   fa::Automaton fa;
   fa.addState(0);
   fa.addSymbol('a');
-  EXPECT_TRUE(fa.removeTransition(0, 'a', 0));
+  EXPECT_FALSE(fa.removeTransition(0, 'a', 0));
   EXPECT_EQ(fa.countTransitions(), 0u);
 }
 TEST(AutomatonRemoveTransitionTest, lastTransitionRemaining) {
