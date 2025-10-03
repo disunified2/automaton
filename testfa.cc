@@ -570,7 +570,81 @@ TEST(AutomatonCountTransitionsTest, multipleTransitionsSameSymbol) {
   EXPECT_EQ(fa.countTransitions(), 2u);
 }
 
+// TESTS DU TP2
 
+// Tests for hasEpsilonTransition()
+TEST(AutomatonHasEpsilonTransition, notPresent) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  EXPECT_FALSE(fa.hasEpsilonTransition());
+}
+TEST(AutomatonHasEpsilonTransition, present) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, fa::Epsilon, 0);
+  EXPECT_TRUE(fa.hasEpsilonTransition());
+}
+TEST(AutomatonHasEspilonTransition, epsilonToSelf) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, fa::Epsilon, 0);
+  EXPECT_TRUE(fa.hasEpsilonTransition());
+}
+
+// Test for isDeterministic()
+TEST(AutomatonIsDeterministicTest, automatonIsDeterministic) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateInitial(0);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'a', 0);
+  EXPECT_TRUE(fa.isDeterministic());
+}
+TEST(AutomatonIsDeterministicTest, automatonNoFinalState) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateInitial(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  EXPECT_TRUE(fa.isDeterministic());
+}
+TEST(AutomatonIsDeterministicTest, multipleInitialStates) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateInitial(0);
+  fa.setStateInitial(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  EXPECT_FALSE(fa.isDeterministic());
+}
+TEST(AutomatonIsDeterministicTest, noInitialState) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  EXPECT_FALSE(fa.isDeterministic());
+}
+TEST(AutomatonIsDeterministicTest, notDeterministic) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateInitial(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  fa.addTransition(0, 'a', 1);
+  EXPECT_FALSE(fa.isDeterministic());
+}
 
 
 
