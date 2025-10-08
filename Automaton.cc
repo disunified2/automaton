@@ -165,7 +165,14 @@ namespace fa {
   }
 
   bool Automaton::hasEpsilonTransition() const {
-    return true;
+    for (const auto& state : states) {
+      for (const auto& symbol : state.second.transitions) {
+        if (symbol.first == fa::Epsilon) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   bool Automaton::isDeterministic() const {
