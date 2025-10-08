@@ -186,17 +186,12 @@ namespace fa {
         ++initial;
       }
 
-      if (state.second.transitions.size() > countSymbols()) {
-        return false;
-      }
-
       for (const auto& symbol : state.second.transitions) {
         if (symbol.second.size() != 1) {
           return false;
         }
       }
     }
-
     if (initial != 1) {
       return false;
     }
@@ -205,6 +200,16 @@ namespace fa {
   }
 
   bool Automaton::isComplete() const {
+    if (hasEpsilonTransition()) {
+      return false;
+    }
+
+    for (const auto& state : states) {
+      if (state.second.transitions.size() != countSymbols()) {
+        return false;
+      }
+    }
+
     return true;
   }
 
