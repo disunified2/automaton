@@ -687,6 +687,19 @@ TEST(AutomatonIsCompleteTest, initialAndFinalStates) {
   fa.addTransition(1, 'a', 0);
   EXPECT_TRUE(fa.isComplete());
 }
+TEST(AutomatonIsCompleteTest, multipleTransitionsSameSymbol) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'b', 1);
+  fa.addTransition(1, 'b', 0);
+  fa.addTransition(0, 'a', 0);
+  fa.addTransition(0, 'b', 0);
+  fa.addTransition(1, 'a', 1);
+  EXPECT_TRUE(fa.isComplete());
+}
 
 // Tests for makeTransition()
 
