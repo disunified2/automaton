@@ -596,7 +596,7 @@ TEST(AutomatonHasEspilonTransition, epsilonToSelf) {
   EXPECT_TRUE(fa.hasEpsilonTransition());
 }
 
-// Test for isDeterministic()
+// Tests for isDeterministic()
 TEST(AutomatonIsDeterministicTest, automatonIsDeterministic) {
   fa::Automaton fa;
   fa.addState(0);
@@ -646,6 +646,22 @@ TEST(AutomatonIsDeterministicTest, notDeterministic) {
   EXPECT_FALSE(fa.isDeterministic());
 }
 
+// Tests for isComplete()
+TEST(AutomatonIsCompleteTest, automatonIsComplete) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  EXPECT_TRUE(fa.isComplete());
+}
+TEST(AutomatonIsCompleteTest, automatonIsNotComplete) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  EXPECT_FALSE(fa.isComplete());
+}
 
 
 
