@@ -730,6 +730,26 @@ TEST(AutomatonCreateCompleteTest, noTransitions) {
   EXPECT_TRUE(complete.isComplete());
 }
 
+// TODO : Tests for createComplement need createDeterministic and match to work
+// Tests for createComplement()
+TEST(AutomatonCreateComplementTest, deterministicComplete) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateInitial(0);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'b', 1);
+  fa.addTransition(1, 'b', 0);
+  fa.addTransition(0, 'a', 0);
+  fa.addTransition(1, 'a', 1);
+  EXPECT_TRUE(fa.isDeterministic());
+  EXPECT_TRUE(fa.isComplete());
+  EXPECT_TRUE(fa.match("ababaaaa"));
+  fa::Automaton complement = fa::Automaton::createComplement(fa);
+  EXPECT_TRUE(complement.match("bababbbb"));
+}
+
 
 
 
