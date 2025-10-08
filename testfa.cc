@@ -701,10 +701,34 @@ TEST(AutomatonIsCompleteTest, multipleTransitionsSameSymbol) {
   EXPECT_TRUE(fa.isComplete());
 }
 
-// Tests for makeTransition()
-
-
-
+// Tests for createComplete()
+TEST(AutomatonCreateCompleteTest, alreadyComplete) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  const fa::Automaton complete = fa::Automaton::createComplete(fa);
+  EXPECT_TRUE(fa.isComplete());
+  EXPECT_TRUE(complete.isComplete());
+}
+TEST(AutomatonCreateCompleteTest, notComplete) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  const fa::Automaton complete = fa::Automaton::createComplete(fa);
+  EXPECT_FALSE(fa.isComplete());
+  EXPECT_TRUE(complete.isComplete());
+}
+TEST(AutomatonCreateCompleteTest, noTransitions) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  const fa::Automaton complete = fa::Automaton::createComplete(fa);
+  EXPECT_FALSE(fa.isComplete());
+  EXPECT_TRUE(complete.isComplete());
+}
 
 
 
