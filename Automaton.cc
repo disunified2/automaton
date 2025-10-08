@@ -176,6 +176,29 @@ namespace fa {
   }
 
   bool Automaton::isDeterministic() const {
+    if (hasEpsilonTransition()) {
+      return false;
+    }
+
+    size_t initial = 0;
+    for (const auto& state : states) {
+      if (state.second.isInitial) {
+        ++initial;
+      }
+
+      if (state.second.transitions.size() > countSymbols()) {
+        return false;
+      }
+
+      for (const auto& symbol : state.second.transitions) {
+        if (symbol.second.size() != 1) {
+          return false;
+        }
+      }
+    }
+
+    if (initial != 1) { return false; }
+
     return true;
   }
 
