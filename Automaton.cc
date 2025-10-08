@@ -197,7 +197,9 @@ namespace fa {
       }
     }
 
-    if (initial != 1) { return false; }
+    if (initial != 1) {
+      return false;
+    }
 
     return true;
   }
