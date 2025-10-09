@@ -847,6 +847,7 @@ TEST(AutomatonCreateMirrorTest, mirrorTransition) {
   EXPECT_TRUE(mirror.hasTransition(1, 'a', 0));
 }
 
+// Tests for makeTransition()
 
 
 
