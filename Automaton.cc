@@ -224,7 +224,7 @@ namespace fa {
   }
 
   bool Automaton::match(const std::string& word) const {
-    return true;
+    return false;
   }
 
   void Automaton::removeNonAccessibleStates() {

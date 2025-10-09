@@ -730,7 +730,7 @@ TEST(AutomatonCreateCompleteTest, noTransitions) {
   EXPECT_TRUE(complete.isComplete());
 }
 
-// TODO : Tests for createComplement need createDeterministic and match to work
+// TODO : Problème avec la chaîne a match
 // Tests for createComplement()
 TEST(AutomatonCreateComplementTest, deterministicComplete) {
   fa::Automaton fa;
@@ -740,15 +740,68 @@ TEST(AutomatonCreateComplementTest, deterministicComplete) {
   fa.addSymbol('a');
   fa.addSymbol('b');
   fa.addTransition(0, 'b', 1);
-  fa.addTransition(1, 'b', 0);
+  fa.addTransition(1, 'a', 0);
   fa.addTransition(0, 'a', 0);
-  fa.addTransition(1, 'a', 1);
   EXPECT_TRUE(fa.isDeterministic());
   EXPECT_TRUE(fa.isComplete());
   EXPECT_TRUE(fa.match("ababaaaa"));
   fa::Automaton complement = fa::Automaton::createComplement(fa);
-  EXPECT_TRUE(complement.match("bababbbb"));
+  EXPECT_TRUE(complement.match("abbaaa"));
 }
+TEST(AutomatonCreateComplementTest, notDeterministic) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'b', 1);
+  fa.addTransition(1, 'b', 0);
+  fa.addTransition(0, 'a', 0);
+  fa.addTransition(1, 'a', 1);
+  EXPECT_TRUE(fa.isComplete());
+  EXPECT_FALSE(fa.isDeterministic());
+  fa::Automaton complement = fa::Automaton::createComplement(fa);
+  EXPECT_TRUE(complement.isDeterministic());
+  EXPECT_TRUE(complement.isComplete());
+}
+TEST(AutomatonCreateComplementTest, notComplete) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateInitial(0);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'b', 1);
+  EXPECT_FALSE(fa.isComplete());
+  EXPECT_TRUE(fa.isDeterministic());
+  fa::Automaton complement = fa::Automaton::createComplement(fa);
+  EXPECT_TRUE(complement.isDeterministic());
+  EXPECT_TRUE(complement.isComplete());
+}
+TEST(AutomatonCreateComplementTest, complementOfComplement) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateInitial(0);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'b', 1);
+  fa.addTransition(1, 'a', 0);
+  fa.addTransition(0, 'a', 0);
+  fa::Automaton complement = fa::Automaton::createComplement(fa);
+  fa::Automaton complement2 = fa::Automaton::createComplement(complement);
+  EXPECT_TRUE(fa.match("ababaaa"));
+  EXPECT_FALSE(fa.match("abbaaa"));
+  EXPECT_TRUE(complement.match("abbaaa"));
+  EXPECT_TRUE(complement2.match("ababaaa"));
+}
+
+// Tests for createMirror()
+
 
 
 
