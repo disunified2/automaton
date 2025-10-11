@@ -185,7 +185,6 @@ namespace fa {
       if (state.second.isInitial) {
         ++initial;
       }
-
       for (const auto& symbol : state.second.transitions) {
         if (symbol.second.size() != 1) {
           return false;
@@ -246,8 +245,33 @@ namespace fa {
   }
 
   Automaton Automaton::createMirror(const Automaton& automaton) {
+    fa::Automaton mirror;
 
-    return automaton;
+    // Add the states to mirror and invert the states
+    for (auto& state : automaton.states) {
+      mirror.addState(state.first);
+      if (state.second.isInitial) {
+        mirror.setStateFinal(state.first);
+      }
+      if (state.second.isFinal) {
+        mirror.setStateInitial(state.first);
+      }
+    }
+
+    // Add the symbols to mirror
+    for (auto& symbol : automaton.symbols) {
+      mirror.addSymbol(symbol);
+    }
+
+    // Add the transitions to mirror
+    for (auto& state : automaton.states) {
+      for (auto& symbol : state.second.transitions) {
+        for (auto& state2 : symbol.second) {
+          mirror.addTransition(state2.first, symbol.first, state.first);
+        }
+      }
+    }
+    return mirror;
   }
 
   Automaton Automaton::createComplete(const Automaton& automaton) {
@@ -280,6 +304,14 @@ namespace fa {
   }
 
   Automaton Automaton::createComplement(const Automaton& automaton) {
+    fa::Automaton complement = automaton;
+    complement = createDeterministic(automaton);
+    complement = createComplete(complement);
+
+    for (auto& state : complement.states) {
+      state.second.isFinal = !state.second.isFinal;
+    }
+
     return automaton;
   }
 
