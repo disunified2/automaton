@@ -211,11 +211,13 @@ namespace fa {
   }
 
   std::set<int> Automaton::makeTransition(const std::set<int>& origin, char alpha) const {
+    // The returned set is the set of states that are present with hasTransition(origin[i], alpha, state)
     std::set<int> result;
     return result;
   }
 
   std::set<int> Automaton::readString(const std::string& word) const {
+    // The returned set is the set of states gone through to read the word
     std::set<int> result;
     return result;
   }

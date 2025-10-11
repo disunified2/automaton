@@ -701,6 +701,192 @@ TEST(AutomatonIsCompleteTest, multipleTransitionsSameSymbol) {
   EXPECT_TRUE(fa.isComplete());
 }
 
+// Tests for makeTransition()
+TEST(AutomatonMakeTransitionTest, emptyOrigin) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  std::set<int> origin;
+  const std::set<int> result = fa.makeTransition(origin, 'a');
+  EXPECT_TRUE(result.empty());
+}
+TEST(AutomatonMakeTransitionTest, symbolNotPresent) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  std::set<int> origin;
+  origin.insert(0);
+  const std::set<int> result = fa.makeTransition(origin, 'b');
+  EXPECT_TRUE(result.empty());
+}
+TEST(AutomatonMakeTransitionTest, symbolPresentNoTransitions) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'a', 0);
+  std::set<int> origin;
+  origin.insert(0);
+  const std::set<int> result = fa.makeTransition(origin, 'b');
+  EXPECT_TRUE(result.empty());
+}
+TEST(AutomatonMakeTransitionTest, stateMultipleTimes) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addTransition(1, 'a', 1);
+  fa.addTransition(0, 'a', 1);
+  std::set<int> origin;
+  origin.insert(0);
+  origin.insert(1);
+  const std::set<int> result = fa.makeTransition(origin, 'a');
+  EXPECT_FALSE(result.empty());
+  EXPECT_EQ(result.size(), 1u);
+  EXPECT_TRUE(result.find(1) != result.end());
+}
+TEST(AutomatonMakeTransitionTest, multipleTransitions) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(1, 'a', 1);
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(0, 'b', 0);
+  std::set<int> origin;
+  origin.insert(0);
+  origin.insert(1);
+  const std::set<int> result = fa.makeTransition(origin, 'b');
+  EXPECT_FALSE(result.empty());
+  EXPECT_EQ(result.size(), 1u);
+  EXPECT_TRUE(result.find(0) != result.end());
+}
+TEST(AutomatonMakeTransitionTest, originNotMax) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'a', 0);
+  std::set<int> origin;
+  origin.insert(1);
+  const std::set<int> result = fa.makeTransition(origin, 'a');
+  EXPECT_FALSE(result.empty());
+  EXPECT_EQ(result.size(), 1u);
+  EXPECT_TRUE(result.find(0) != result.end());
+  EXPECT_FALSE(result.find(1) != result.end());
+}
+
+// Tests for readString()
+TEST(AutomatonReadStringTest, noTransition) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateInitial(0);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  std::set<int> result = fa.readString("ab");
+  EXPECT_TRUE(result.empty());
+}
+TEST(AutomatonReadStringTest, noInitialStates) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  std::set<int> result = fa.readString("a");
+  EXPECT_TRUE(result.empty());
+}
+TEST(AutomatonReadStringTest, emptyWord) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.setStateInitial(0);
+  fa.addSymbol('a');
+  std::set<int> result = fa.readString("");
+  EXPECT_TRUE(result.empty());
+}
+TEST(AutomatonReadStringTest, oneStateRead) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.setStateInitial(0);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'a', 0);
+  fa.addTransition(0, 'b', 0);
+  std::set<int> result = fa.readString("ab");
+  EXPECT_FALSE(result.empty());
+  EXPECT_EQ(result.size(), 1u);
+  EXPECT_TRUE(result.find(0) != result.end());
+}
+TEST(AutomatonReadStringTest, multipleStatesRead) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateInitial(0);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'b', 2);
+  std::set<int> result = fa.readString("ab");
+  EXPECT_FALSE(result.empty());
+  EXPECT_EQ(result.size(), 3u);
+  EXPECT_TRUE(result.find(0) != result.end() && result.find(1) != result.end() && result.find(2) != result.end());
+}
+
+// Tests for createMirror()
+TEST(AutomatonCreateMirrorTest, simpleAutomaton) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateInitial(0);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  const fa::Automaton mirror = fa::Automaton::createMirror(fa);
+  EXPECT_TRUE(mirror.isStateInitial(1));
+  EXPECT_TRUE(mirror.isStateFinal(0));
+  EXPECT_TRUE(mirror.hasTransition(1, 'a', 0));
+}
+TEST(AutomatonCreateMirrorTest, initialAndFinal) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.setStateInitial(0);
+  fa.setStateFinal(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  const fa::Automaton mirror = fa::Automaton::createMirror(fa);
+  EXPECT_TRUE(mirror.isStateInitial(0));
+  EXPECT_TRUE(mirror.isStateFinal(0));
+  EXPECT_TRUE(mirror.hasTransition(0, 'a', 0));
+}
+TEST(AutomatonCreateMirrorTest, noInitialFinal) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  const fa::Automaton mirror = fa::Automaton::createMirror(fa);
+  EXPECT_FALSE(mirror.isStateInitial(0));
+  EXPECT_FALSE(mirror.isStateFinal(0));
+  EXPECT_TRUE(mirror.hasTransition(0, 'a', 0));
+}
+TEST(AutomatonCreateMirrorTest, mirrorTransition) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'a', 0);
+  const fa::Automaton mirror = fa::Automaton::createMirror(fa);
+  EXPECT_TRUE(mirror.hasTransition(0, 'a', 1));
+  EXPECT_TRUE(mirror.hasTransition(1, 'a', 0));
+}
+
 // Tests for createComplete()
 TEST(AutomatonCreateCompleteTest, alreadyComplete) {
   fa::Automaton fa;
@@ -819,132 +1005,8 @@ TEST(AutomatonCreateComplementTest, invertStates) {
   EXPECT_FALSE(complement.isStateFinal(0));
 }
 
-// Tests for createMirror()
-TEST(AutomatonCreateMirrorTest, simpleAutomaton) {
-  fa::Automaton fa;
-  fa.addState(0);
-  fa.addState(1);
-  fa.setStateInitial(0);
-  fa.setStateFinal(1);
-  fa.addSymbol('a');
-  fa.addTransition(0, 'a', 1);
-  const fa::Automaton mirror = fa::Automaton::createMirror(fa);
-  EXPECT_TRUE(mirror.isStateInitial(1));
-  EXPECT_TRUE(mirror.isStateFinal(0));
-  EXPECT_TRUE(mirror.hasTransition(1, 'a', 0));
-}
-TEST(AutomatonCreateMirrorTest, initialAndFinal) {
-  fa::Automaton fa;
-  fa.addState(0);
-  fa.setStateInitial(0);
-  fa.setStateFinal(0);
-  fa.addSymbol('a');
-  fa.addTransition(0, 'a', 0);
-  const fa::Automaton mirror = fa::Automaton::createMirror(fa);
-  EXPECT_TRUE(mirror.isStateInitial(0));
-  EXPECT_TRUE(mirror.isStateFinal(0));
-  EXPECT_TRUE(mirror.hasTransition(0, 'a', 0));
-}
-TEST(AutomatonCreateMirrorTest, noInitialFinal) {
-  fa::Automaton fa;
-  fa.addState(0);
-  fa.addSymbol('a');
-  fa.addTransition(0, 'a', 0);
-  const fa::Automaton mirror = fa::Automaton::createMirror(fa);
-  EXPECT_FALSE(mirror.isStateInitial(0));
-  EXPECT_FALSE(mirror.isStateFinal(0));
-  EXPECT_TRUE(mirror.hasTransition(0, 'a', 0));
-}
-TEST(AutomatonCreateMirrorTest, mirrorTransition) {
-  fa::Automaton fa;
-  fa.addState(0);
-  fa.addState(1);
-  fa.addSymbol('a');
-  fa.addTransition(0, 'a', 1);
-  fa.addTransition(1, 'a', 0);
-  const fa::Automaton mirror = fa::Automaton::createMirror(fa);
-  EXPECT_TRUE(mirror.hasTransition(0, 'a', 1));
-  EXPECT_TRUE(mirror.hasTransition(1, 'a', 0));
-}
 
-// Tests for makeTransition()
-TEST(AutomatonMakeTransitionTest, emptyOrigin) {
-  fa::Automaton fa;
-  fa.addState(0);
-  fa.addSymbol('a');
-  fa.addTransition(0, 'a', 0);
-  std::set<int> origin;
-  const std::set<int> result = fa.makeTransition(origin, 'a');
-  EXPECT_TRUE(result.empty());
-}
-TEST(AutomatonMakeTransitionTest, symbolNotPresent) {
-  fa::Automaton fa;
-  fa.addState(0);
-  fa.addSymbol('a');
-  fa.addTransition(0, 'a', 0);
-  std::set<int> origin;
-  origin.insert(0);
-  const std::set<int> result = fa.makeTransition(origin, 'b');
-  EXPECT_TRUE(result.empty());
-}
-TEST(AutomatonMakeTransitionTest, symbolPresentNoTransitions) {
-  fa::Automaton fa;
-  fa.addState(0);
-  fa.addSymbol('a');
-  fa.addSymbol('b');
-  fa.addTransition(0, 'a', 0);
-  std::set<int> origin;
-  origin.insert(0);
-  const std::set<int> result = fa.makeTransition(origin, 'b');
-  EXPECT_TRUE(result.empty());
-}
-TEST(AutomatonMakeTransitionTest, stateMultipleTimes) {
-  fa::Automaton fa;
-  fa.addState(0);
-  fa.addState(1);
-  fa.addSymbol('a');
-  fa.addTransition(1, 'a', 1);
-  fa.addTransition(0, 'a', 1);
-  std::set<int> origin;
-  origin.insert(0);
-  origin.insert(1);
-  const std::set<int> result = fa.makeTransition(origin, 'a');
-  EXPECT_FALSE(result.empty());
-  EXPECT_EQ(result.size(), 1u);
-  EXPECT_TRUE(result.find(1) != result.end());
-}
-TEST(AutomatonMakeTransitionTest, multipleTransitions) {
-  fa::Automaton fa;
-  fa.addState(0);
-  fa.addState(1);
-  fa.addSymbol('a');
-  fa.addSymbol('b');
-  fa.addTransition(1, 'a', 1);
-  fa.addTransition(0, 'a', 1);
-  fa.addTransition(0, 'b', 0);
-  std::set<int> origin;
-  origin.insert(0);
-  origin.insert(1);
-  const std::set<int> result = fa.makeTransition(origin, 'b');
-  EXPECT_FALSE(result.empty());
-  EXPECT_EQ(result.size(), 1u);
-  EXPECT_TRUE(result.find(0) != result.end());
-}
-TEST(AutomatonMakeTransitionTest, originNotMax) {
-  fa::Automaton fa;
-  fa.addState(0);
-  fa.addState(1);
-  fa.addSymbol('a');
-  fa.addTransition(0, 'a', 1);
-  fa.addTransition(1, 'a', 0);
-  std::set<int> origin;
-  origin.insert(1);
-  const std::set<int> result = fa.makeTransition(origin, 'a');
-  EXPECT_FALSE(result.empty());
-  EXPECT_EQ(result.size(), 1u);
-  EXPECT_TRUE(result.find(0) != result.end());
-  EXPECT_FALSE(result.find(1) != result.end());
-}
+
 
 
 
