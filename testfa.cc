@@ -710,6 +710,7 @@ TEST(AutomatonCreateCompleteTest, alreadyComplete) {
   const fa::Automaton complete = fa::Automaton::createComplete(fa);
   EXPECT_TRUE(fa.isComplete());
   EXPECT_TRUE(complete.isComplete());
+  EXPECT_TRUE(fa.isIncludedIn(complete) && complete.isIncludedIn(fa));
 }
 TEST(AutomatonCreateCompleteTest, notComplete) {
   fa::Automaton fa;
@@ -724,6 +725,14 @@ TEST(AutomatonCreateCompleteTest, notComplete) {
 TEST(AutomatonCreateCompleteTest, noTransitions) {
   fa::Automaton fa;
   fa.addState(0);
+  fa.addSymbol('a');
+  const fa::Automaton complete = fa::Automaton::createComplete(fa);
+  EXPECT_FALSE(fa.isComplete());
+  EXPECT_TRUE(complete.isComplete());
+}
+TEST(AutomatonCreateCompleteTest, maxInt) {
+  fa::Automaton fa;
+  fa.addState(INT_MAX);
   fa.addSymbol('a');
   const fa::Automaton complete = fa::Automaton::createComplete(fa);
   EXPECT_FALSE(fa.isComplete());
