@@ -839,6 +839,61 @@ TEST(AutomatonReadStringTest, multipleStatesRead) {
   EXPECT_TRUE(result.find(0) != result.end() && result.find(1) != result.end() && result.find(2) != result.end());
 }
 
+// Tests for match()
+TEST(AutomatonMatchTest, stateNotFinalEmptyWord) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.setStateInitial(0);
+  fa.addSymbol('a');
+  EXPECT_FALSE(fa.match(""));
+}
+TEST(AutomatonMatchTest, stateFinalemptyWord) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.setStateInitial(0);
+  fa.setStateFinal(0);
+  fa.addSymbol('a');
+  EXPECT_TRUE(fa.match(""));
+}
+TEST(AutomatonMatchTest, statesNotFinal) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateInitial(0);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'b', 2);
+  EXPECT_FALSE(fa.match("ab"));
+}
+TEST(AutomatonMatchTest, correctStateFinal) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateInitial(0);
+  fa.setStateFinal(2);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'b', 2);
+  EXPECT_TRUE(fa.match("ab"));
+}
+TEST(AutomatonMatchTest, wrongStateFinal) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateInitial(0);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'b', 2);
+  EXPECT_FALSE(fa.match("ab"));
+}
+
 // Tests for createMirror()
 TEST(AutomatonCreateMirrorTest, simpleAutomaton) {
   fa::Automaton fa;
