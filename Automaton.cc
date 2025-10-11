@@ -203,13 +203,11 @@ namespace fa {
     if (hasEpsilonTransition()) {
       return false;
     }
-
     for (const auto& state : states) {
       if (state.second.transitions.size() != countSymbols()) {
         return false;
       }
     }
-
     return true;
   }
 
@@ -248,11 +246,37 @@ namespace fa {
   }
 
   Automaton Automaton::createMirror(const Automaton& automaton) {
+
     return automaton;
   }
 
   Automaton Automaton::createComplete(const Automaton& automaton) {
-    return automaton;
+    if (automaton.isComplete()) {
+      return automaton;
+    }
+
+    fa::Automaton complete = automaton;
+
+    // creation of the sink state
+    int sinkState = static_cast<int>(automaton.countStates()) + 1;
+    while(complete.hasState(sinkState)) {
+      ++sinkState;
+    }
+    complete.addState(sinkState);
+    for (const char symbol : automaton.symbols) {
+      complete.addTransition(sinkState, symbol, sinkState);
+    }
+
+    for (auto& state : complete.states) {
+      if (state.second.transitions.size() != complete.symbols.size()) {
+        for (auto& symbol : complete.symbols) {
+          if (state.second.transitions.find(symbol) == state.second.transitions.end()) {
+            complete.addTransition(state.first, symbol, sinkState);
+          }
+        }
+      }
+    }
+    return complete;
   }
 
   Automaton Automaton::createComplement(const Automaton& automaton) {
