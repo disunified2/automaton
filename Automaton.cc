@@ -160,9 +160,13 @@ namespace fa {
     return nbTransitions;
   }
 
+
+
   void Automaton::prettyPrint(std::ostream &os) const {
 
   }
+
+
 
   bool Automaton::hasEpsilonTransition() const {
     for (const auto& state : states) {
@@ -210,6 +214,8 @@ namespace fa {
     return true;
   }
 
+
+
   std::set<int> Automaton::makeTransition(const std::set<int>& origin, char alpha) const {
     // The returned set is the set of states that are present with hasTransition(origin[i], alpha, state)
     std::set<int> result;
@@ -225,6 +231,8 @@ namespace fa {
   bool Automaton::match(const std::string& word) const {
     return false;
   }
+
+
 
   void Automaton::removeNonAccessibleStates() {
 
@@ -245,6 +253,8 @@ namespace fa {
   bool Automaton::isIncludedIn(const Automaton& other) const {
     return true;
   }
+
+
 
   Automaton Automaton::createMirror(const Automaton& automaton) {
     fa::Automaton mirror;
@@ -317,6 +327,8 @@ namespace fa {
     return automaton;
   }
 
+
+
   Automaton Automaton::createIntersection(const Automaton& lhs, const Automaton& rhs) {
     return lhs;
   }
@@ -324,6 +336,8 @@ namespace fa {
   Automaton Automaton::createDeterministic(const Automaton& other) {
     return other;
   }
+
+
 
   Automaton Automaton::createMinimalMoore(const Automaton& other) {
     return other;
