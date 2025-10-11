@@ -868,7 +868,83 @@ TEST(AutomatonCreateMirrorTest, mirrorTransition) {
 }
 
 // Tests for makeTransition()
-
+TEST(AutomatonMakeTransitionTest, emptyOrigin) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  std::set<int> origin;
+  const std::set<int> result = fa.makeTransition(origin, 'a');
+  EXPECT_TRUE(result.empty());
+}
+TEST(AutomatonMakeTransitionTest, symbolNotPresent) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  std::set<int> origin;
+  origin.insert(0);
+  const std::set<int> result = fa.makeTransition(origin, 'b');
+  EXPECT_TRUE(result.empty());
+}
+TEST(AutomatonMakeTransitionTest, symbolPresentNoTransitions) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'a', 0);
+  std::set<int> origin;
+  origin.insert(0);
+  const std::set<int> result = fa.makeTransition(origin, 'b');
+  EXPECT_TRUE(result.empty());
+}
+TEST(AutomatonMakeTransitionTest, stateMultipleTimes) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addTransition(1, 'a', 1);
+  fa.addTransition(0, 'a', 1);
+  std::set<int> origin;
+  origin.insert(0);
+  origin.insert(1);
+  const std::set<int> result = fa.makeTransition(origin, 'a');
+  EXPECT_FALSE(result.empty());
+  EXPECT_EQ(result.size(), 1u);
+  EXPECT_TRUE(result.find(1) != result.end());
+}
+TEST(AutomatonMakeTransitionTest, multipleTransitions) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(1, 'a', 1);
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(0, 'b', 0);
+  std::set<int> origin;
+  origin.insert(0);
+  origin.insert(1);
+  const std::set<int> result = fa.makeTransition(origin, 'b');
+  EXPECT_FALSE(result.empty());
+  EXPECT_EQ(result.size(), 1u);
+  EXPECT_TRUE(result.find(0) != result.end());
+}
+TEST(AutomatonMakeTransitionTest, originNotMax) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'a', 0);
+  std::set<int> origin;
+  origin.insert(1);
+  const std::set<int> result = fa.makeTransition(origin, 'a');
+  EXPECT_FALSE(result.empty());
+  EXPECT_EQ(result.size(), 1u);
+  EXPECT_TRUE(result.find(0) != result.end());
+  EXPECT_FALSE(result.find(1) != result.end());
+}
 
 
 
