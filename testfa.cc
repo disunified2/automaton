@@ -807,6 +807,17 @@ TEST(AutomatonCreateComplementTest, complementOfComplement) {
   EXPECT_TRUE(complement.match("abbaaa"));
   EXPECT_TRUE(complement2.match("ababaaa"));
 }
+TEST(AutomatonCreateComplementTest, invertStates) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.setStateInitial(0);
+  fa.setStateFinal(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  fa::Automaton complement = fa::Automaton::createComplement(fa);
+  EXPECT_TRUE(complement.isStateInitial(0));
+  EXPECT_FALSE(complement.isStateFinal(0));
+}
 
 // Tests for createMirror()
 TEST(AutomatonCreateMirrorTest, simpleAutomaton) {
