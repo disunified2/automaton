@@ -219,6 +219,16 @@ namespace fa {
   std::set<int> Automaton::makeTransition(const std::set<int>& origin, char alpha) const {
     // The returned set is the set of states that are present with hasTransition(origin[i], alpha, state)
     std::set<int> result;
+
+    for (auto it : origin) {
+      if (hasState(it) && states.find(it)->second.transitions.find(alpha) != states.find(it)->second.transitions.end()) {
+        std::map<int, State> arrival_states = states.find(it)->second.transitions.find(alpha)->second;
+        for (const auto& it2 : arrival_states) {
+          result.insert(it2.first);
+        }
+      }
+    }
+
     return result;
   }
 
