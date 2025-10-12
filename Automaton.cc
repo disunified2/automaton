@@ -248,6 +248,12 @@ namespace fa {
   }
 
   bool Automaton::match(const std::string& word) const {
+    const std::set<int> result_states = readString(word);
+    for (int it : result_states) {
+      if (states.find(it)->second.isFinal) {
+        return true;
+      }
+    }
     return false;
   }
 
