@@ -779,6 +779,16 @@ TEST(AutomatonMakeTransitionTest, originNotMax) {
   EXPECT_TRUE(result.find(0) != result.end());
   EXPECT_FALSE(result.find(1) != result.end());
 }
+TEST(AutomatonMakeTransitionTest, stateNotPresent) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  std::set<int> origin;
+  origin.insert(1);
+  const std::set<int> result = fa.makeTransition(origin, 'a');
+  EXPECT_TRUE(result.empty());
+}
 
 // Tests for readString()
 TEST(AutomatonReadStringTest, noTransition) {
@@ -1047,6 +1057,7 @@ TEST(AutomatonCreateComplementTest, complementOfComplement) {
   EXPECT_FALSE(fa.match("abbaaa"));
   EXPECT_TRUE(complement.match("abbaaa"));
   EXPECT_TRUE(complement2.match("ababaaa"));
+  EXPECT_FALSE(complement2.match("abbaaa"));
 }
 TEST(AutomatonCreateComplementTest, invertStates) {
   fa::Automaton fa;
