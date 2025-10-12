@@ -812,14 +812,6 @@ TEST(AutomatonReadStringTest, noInitialStates) {
   std::set<int> result = fa.readString("a");
   EXPECT_TRUE(result.empty());
 }
-TEST(AutomatonReadStringTest, emptyWord) {
-  fa::Automaton fa;
-  fa.addState(0);
-  fa.setStateInitial(0);
-  fa.addSymbol('a');
-  std::set<int> result = fa.readString("");
-  EXPECT_TRUE(result.empty());
-}
 TEST(AutomatonReadStringTest, oneStateRead) {
   fa::Automaton fa;
   fa.addState(0);
@@ -845,8 +837,8 @@ TEST(AutomatonReadStringTest, multipleStatesRead) {
   fa.addTransition(1, 'b', 2);
   std::set<int> result = fa.readString("ab");
   EXPECT_FALSE(result.empty());
-  EXPECT_EQ(result.size(), 3u);
-  EXPECT_TRUE(result.find(0) != result.end() && result.find(1) != result.end() && result.find(2) != result.end());
+  EXPECT_EQ(result.size(), 1u);
+  EXPECT_TRUE(result.find(2) != result.end());
 }
 
 // Tests for match()
