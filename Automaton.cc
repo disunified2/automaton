@@ -340,6 +340,7 @@ namespace fa {
     return complete;
   }
 
+  // TODO : function is not complete and does not recognise complement language
   Automaton Automaton::createComplement(const Automaton& automaton) {
     fa::Automaton complement = automaton;
     complement = createDeterministic(automaton);
