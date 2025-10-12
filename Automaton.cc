@@ -235,6 +235,15 @@ namespace fa {
   std::set<int> Automaton::readString(const std::string& word) const {
     // The returned set is the set of states gone through to read the word
     std::set<int> result;
+
+    for (const auto& it : states) {
+      if (isStateInitial(it.first)) {
+        result.insert(it.first);
+      }
+    }
+    for (char i : word) {
+      result = makeTransition(result, i);
+    }
     return result;
   }
 
