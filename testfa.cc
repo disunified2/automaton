@@ -988,11 +988,17 @@ TEST(AutomatonCreateComplementTest, deterministicComplete) {
   fa.addState(0);
   fa.addState(1);
   fa.setStateInitial(0);
+  fa.setStateFinal(0);
   fa.addSymbol('a');
   fa.addSymbol('b');
   fa.addTransition(0, 'b', 1);
   fa.addTransition(1, 'a', 0);
   fa.addTransition(0, 'a', 0);
+  // Adding a sink state to keep the language the same while making the automaton complete
+  fa.addState(2);
+  fa.addTransition(2, 'a', 2);
+  fa.addTransition(2, 'b', 2);
+  fa.addTransition(1, 'b', 2);
   EXPECT_TRUE(fa.isDeterministic());
   EXPECT_TRUE(fa.isComplete());
   EXPECT_TRUE(fa.match("ababaaaa"));
@@ -1037,7 +1043,7 @@ TEST(AutomatonCreateComplementTest, complementOfComplement) {
   fa.addState(0);
   fa.addState(1);
   fa.setStateInitial(0);
-  fa.setStateFinal(1);
+  fa.setStateFinal(0);
   fa.addSymbol('a');
   fa.addSymbol('b');
   fa.addTransition(0, 'b', 1);
