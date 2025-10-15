@@ -259,6 +259,32 @@ namespace fa {
 
 
 
+  /*
+   * initial : initial state from which to start the search
+   * visited : unordered set of visited states
+   * return_ : choose whether to return a boolean or not
+   */
+  bool Automaton::depthFirstSearch(const int& initial, std::unordered_set<int>& visited, bool return_) const {
+    std::stack<int> stack;
+    stack.push(initial);
+    while (!stack.empty()) {
+      int current = stack.top();
+      stack.pop();
+      if (visited.find(current) == visited.end()) {
+        visited.insert(current);
+        for (const auto& it : states.find(current)->second.transitions) {
+          for (const auto& it2 : it.second) {
+            if (return_ && it2.second.isFinal) {
+              return true;
+            }
+            stack.push(it2.first);
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   void Automaton::removeNonAccessibleStates() {
 
   }
@@ -354,32 +380,6 @@ namespace fa {
   }
 
 
-
-  /*
-   * initial : initial state from which to start the search
-   * visited : unordered set of visited states
-   * return_ : choose whether to return a boolean or not
-   */
-  bool Automaton::depthFirstSearch(const int& initial, std::unordered_set<int>& visited, bool return_) const {
-    std::stack<int> stack;
-    stack.push(initial);
-    while (!stack.empty()) {
-      int current = stack.top();
-      stack.pop();
-      if (visited.find(current) == visited.end()) {
-        visited.insert(current);
-        for (const auto& it : states.find(current)->second.transitions) {
-          for (const auto& it2 : it.second) {
-            if (return_ && it2.second.isFinal) {
-              return true;
-            }
-            stack.push(it2.first);
-          }
-        }
-      }
-    }
-    return false;
-  }
 
   Automaton Automaton::createIntersection(const Automaton& lhs, const Automaton& rhs) {
     return lhs;
