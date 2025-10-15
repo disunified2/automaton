@@ -4,6 +4,7 @@
 #include <iostream>
 #include <list>
 #include <ostream>
+#include <stack>
 
 namespace fa {
 
