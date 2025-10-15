@@ -841,6 +841,23 @@ TEST(AutomatonReadStringTest, multipleStatesRead) {
   EXPECT_EQ(result.size(), 1u);
   EXPECT_TRUE(result.find(2) != result.end());
 }
+TEST(AutomatonReadStringTest, multiplePaths) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.addState(3);
+  fa.setStateInitial(0);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'b', 2);
+  fa.addTransition(1, 'b', 3);
+  std::set<int> result = fa.readString("ab");
+  EXPECT_FALSE(result.empty());
+  EXPECT_EQ(result.size(), 2u);
+  EXPECT_TRUE(result.find(2) != result.end() && result.find(3) != result.end());
+}
 
 // Tests for match()
 TEST(AutomatonMatchTest, stateNotFinalEmptyWord) {
