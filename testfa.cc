@@ -914,6 +914,36 @@ TEST(AutomatonMatchTest, wrongStateFinal) {
   EXPECT_FALSE(fa.match("ab"));
 }
 
+// Tests for isLanguageEmpty()
+TEST(AutomatonIsLanguageEmpty, noInitialState) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateInitial(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  EXPECT_TRUE(fa.isLanguageEmpty());
+}
+TEST(AutomatonIsLanguageEmpty, noFinalState) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  EXPECT_TRUE(fa.isLanguageEmpty());
+}
+TEST(AutomatonIsLanguageEmpty, languageNotEmpty) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateInitial(0);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  EXPECT_FALSE(fa.isLanguageEmpty());
+}
+
 // Tests for createMirror()
 TEST(AutomatonCreateMirrorTest, simpleAutomaton) {
   fa::Automaton fa;
