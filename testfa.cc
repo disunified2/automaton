@@ -2,6 +2,7 @@
 #include "gtest/gtest.h"
 
 #include "Automaton.h"
+#include <climits>
 
 // Example test
 TEST(AutomatonExampleTest, Default) {
