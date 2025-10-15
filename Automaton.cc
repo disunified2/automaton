@@ -355,6 +355,11 @@ namespace fa {
 
 
 
+  /*
+   * initial : initial state from which to start the search
+   * visited : unordered set of visited states
+   * return_ : choose whether to return a boolean or not
+   */
   bool Automaton::depthFirstSearch(const int& initial, std::unordered_set<int>& visited, bool return_) const {
     std::stack<int> stack;
     stack.push(initial);
