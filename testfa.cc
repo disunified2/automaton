@@ -971,7 +971,33 @@ TEST(AutomatonIsLanguageEmptyTest, twoInitial) {
 }
 
 // Tests for removeNonAccessibleStates()
-TEST(AutomatonRemoveNonAccessibleStatesTest, )
+TEST(AutomatonRemoveNonAccessibleStatesTest, noInitialState) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateFinal(2);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'a', 2);
+  fa.removeNonAccessibleStates();
+  EXPECT_EQ(fa.countStates(), 1u);
+  EXPECT_TRUE(fa.hasSymbol('a'));
+  EXPECT_TRUE(fa.isLanguageEmpty());
+}
+TEST(AutomatonRemoveNonAccessibleStatesTest, noPathToState) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateInitial(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.removeNonAccessibleStates();
+  EXPECT_EQ(fa.countStates(), 2u);
+  EXPECT_TRUE(fa.hasSymbol('a'));
+  EXPECT_TRUE(fa.isLanguageEmpty());
+}
 
 // Tests for createMirror()
 TEST(AutomatonCreateMirrorTest, simpleAutomaton) {
