@@ -372,8 +372,8 @@ namespace fa {
     complement = createDeterministic(automaton);
     complement = createComplete(complement);
 
-    for (auto state : complement.states) {
-      state.second.isFinal = !state.second.isFinal;
+    for (const auto& state : complement.states) {
+      complement.states.at(state.first).isFinal = !complement.states.at(state.first).isFinal;
     }
 
     return complement;
