@@ -915,7 +915,7 @@ TEST(AutomatonMatchTest, wrongStateFinal) {
 }
 
 // Tests for isLanguageEmpty()
-TEST(AutomatonIsLanguageEmpty, noInitialState) {
+TEST(AutomatonIsLanguageEmptyTest, noInitialState) {
   fa::Automaton fa;
   fa.addState(0);
   fa.addState(1);
@@ -924,7 +924,7 @@ TEST(AutomatonIsLanguageEmpty, noInitialState) {
   fa.addTransition(0, 'a', 1);
   EXPECT_TRUE(fa.isLanguageEmpty());
 }
-TEST(AutomatonIsLanguageEmpty, noFinalState) {
+TEST(AutomatonIsLanguageEmptyTest, noFinalState) {
   fa::Automaton fa;
   fa.addState(0);
   fa.addState(1);
@@ -933,7 +933,7 @@ TEST(AutomatonIsLanguageEmpty, noFinalState) {
   fa.addTransition(0, 'a', 1);
   EXPECT_TRUE(fa.isLanguageEmpty());
 }
-TEST(AutomatonIsLanguageEmpty, languageNotEmpty) {
+TEST(AutomatonIsLanguageEmptyTest, languageNotEmpty) {
   fa::Automaton fa;
   fa.addState(0);
   fa.addState(1);
@@ -943,6 +943,35 @@ TEST(AutomatonIsLanguageEmpty, languageNotEmpty) {
   fa.addTransition(0, 'a', 1);
   EXPECT_FALSE(fa.isLanguageEmpty());
 }
+TEST(AutomatonIsLanguageEmptyTest, twoFinal) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateInitial(0);
+  fa.setStateFinal(1);
+  fa.setStateFinal(2);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(0, 'a', 2);
+  EXPECT_FALSE(fa.isLanguageEmpty());
+}
+TEST(AutomatonIsLanguageEmptyTest, twoInitial) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateInitial(0);
+  fa.setStateInitial(1);
+  fa.setStateFinal(2);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 2);
+  fa.addTransition(1, 'a', 2);
+  EXPECT_FALSE(fa.isLanguageEmpty());
+}
+
+// Tests for removeNonAccessibleStates()
+TEST(AutomatonRemoveNonAccessibleStatesTest, )
 
 // Tests for createMirror()
 TEST(AutomatonCreateMirrorTest, simpleAutomaton) {
