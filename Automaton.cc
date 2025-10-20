@@ -368,15 +368,15 @@ namespace fa {
   }
 
   Automaton Automaton::createComplement(const Automaton& automaton) {
-    fa::Automaton complement = automaton;
+    Automaton complement = automaton;
     complement = createDeterministic(automaton);
     complement = createComplete(complement);
 
-    for (auto& state : complement.states) {
+    for (auto state : complement.states) {
       state.second.isFinal = !state.second.isFinal;
     }
 
-    return automaton;
+    return complement;
   }
 
 
@@ -386,6 +386,9 @@ namespace fa {
   }
 
   Automaton Automaton::createDeterministic(const Automaton& other) {
+    if (other.isDeterministic()) {
+      return other;
+    }
     return other;
   }
 
