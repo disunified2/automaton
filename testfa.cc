@@ -1051,7 +1051,7 @@ TEST(AutomatonCreateComplementTest, deterministicComplete) {
   EXPECT_TRUE(fa.isComplete());
   EXPECT_TRUE(fa.match("ababaaaa"));
   const fa::Automaton complement = fa::Automaton::createComplement(fa);
-  EXPECT_TRUE(complement.match("abbaaa"));
+  EXPECT_TRUE(complement.match("abbaaaa"));
 }
 TEST(AutomatonCreateComplementTest, notDeterministic) {
   fa::Automaton fa;
@@ -1092,6 +1092,7 @@ TEST(AutomatonCreateComplementTest, complementOfComplement) {
   fa.addState(1);
   fa.setStateInitial(0);
   fa.setStateFinal(0);
+  fa.setStateFinal(1);
   fa.addSymbol('a');
   fa.addSymbol('b');
   fa.addTransition(0, 'b', 1);
@@ -1115,6 +1116,25 @@ TEST(AutomatonCreateComplementTest, invertStates) {
   fa::Automaton complement = fa::Automaton::createComplement(fa);
   EXPECT_TRUE(complement.isStateInitial(0));
   EXPECT_FALSE(complement.isStateFinal(0));
+}
+TEST(AutomatonCreateComplementTest, exampleAutomaton) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateInitial(0);
+  fa.setStateFinal(0);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'a', 0);
+  fa.addTransition(1, 'a', 0);
+  fa.addTransition(0, 'b', 1);
+  EXPECT_TRUE(fa.match("abababa"));
+  EXPECT_FALSE(fa.match("abbaaa"));
+  fa::Automaton complement = fa::Automaton::createComplement(fa);
+  EXPECT_TRUE(complement.isComplete());
+  EXPECT_TRUE(complement.match("abbaaa"));
+  EXPECT_FALSE(complement.match("ababaaa"));
 }
 
 
