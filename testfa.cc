@@ -998,6 +998,58 @@ TEST(AutomatonRemoveNonAccessibleStatesTest, noPathToState) {
   EXPECT_TRUE(fa.hasSymbol('a'));
   EXPECT_TRUE(fa.isLanguageEmpty());
 }
+TEST(AutomatonRemoveNonAccessibleStatesTest, noNonAccesible) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateInitial(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(0, 'a', 2);
+  fa.removeNonAccessibleStates();
+  EXPECT_EQ(fa.countStates(), 3u);
+}
+TEST(AutomatonRemoveNonAccessibleStatesTest, noNonAccessiblePathfind) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateInitial(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'a', 2);
+  fa.removeNonAccessibleStates();
+  EXPECT_EQ(fa.countStates(), 3u);
+}
+TEST(AutomatonRemoveNonAccessibleStatesTest, wrongDirection) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateInitial(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(2, 'a', 0);
+  fa.removeNonAccessibleStates();
+  EXPECT_EQ(fa.countStates(), 2u);
+}
+TEST(AutomatonRemoveNonAccessibleStatesTest, sameLanguage) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateInitial(0);
+  fa.setStateFinal(1);
+  fa.setStateFinal(2);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(2, 'a', 2);
+  EXPECT_TRUE(fa.match("a"));
+  fa.removeNonAccessibleStates();
+  EXPECT_EQ(fa.countStates(), 2u);
+  EXPECT_TRUE(fa.match("a"));
+}
 
 // Tests for createMirror()
 TEST(AutomatonCreateMirrorTest, simpleAutomaton) {
