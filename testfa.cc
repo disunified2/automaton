@@ -1051,6 +1051,82 @@ TEST(AutomatonRemoveNonAccessibleStatesTest, sameLanguage) {
   EXPECT_TRUE(fa.match("a"));
 }
 
+// Tests for removeNonCoAccessibleStates()
+TEST(AutomatonRemoveNonCoAccessibleStatesTest, noInitialStates) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateFinal(2);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'a', 2);
+  fa.removeNonCoAccessibleStates();
+  EXPECT_EQ(fa.countSymbols(), 1u);
+  EXPECT_TRUE(fa.hasSymbol('a'));
+  EXPECT_TRUE(fa.isLanguageEmpty());
+}
+TEST(AutomatonRemoveNonCoAccessibleStatesTest, noFinalStates) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateInitial(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'a', 2);
+  fa.removeNonCoAccessibleStates();
+  EXPECT_EQ(fa.countStates(), 1u);
+}
+TEST(AutomatonRemoveNonCoAccessibleStatesTest, notCoAccessible) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateInitial(0);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'a', 2);
+  fa.removeNonCoAccessibleStates();
+  EXPECT_EQ(fa.countStates(), 2u);
+  EXPECT_TRUE(fa.match("a"));
+}
+TEST(AutomatonRemoveNonCoAccessibleStatesTest, noDeletion) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateInitial(0);
+  fa.setStateFinal(2);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'a', 2);
+  fa.removeNonCoAccessibleStates();
+  EXPECT_EQ(fa.countStates(), 3u);
+  EXPECT_TRUE(fa.match("aa"));
+}
+TEST(AutomatonRemoveNonCoAccessibleStatesTest, multiplePaths) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.addState(3);
+  fa.addState(4);
+  fa.setStateInitial(0);
+  fa.setStateFinal(3);
+  fa.setStateFinal(4);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'a', 3);
+  fa.addTransition(0, 'b', 3);
+  fa.addTransition(3, 'b', 4);
+  fa.removeNonCoAccessibleStates();
+  EXPECT_EQ(fa.countSymbols(), 5u);
+  EXPECT_TRUE(fa.match("aa") && fa.match("bb"));
+}
+
 // Tests for createMirror()
 TEST(AutomatonCreateMirrorTest, simpleAutomaton) {
   fa::Automaton fa;
