@@ -1120,10 +1120,10 @@ TEST(AutomatonRemoveNonCoAccessibleStatesTest, multiplePaths) {
   fa.addSymbol('b');
   fa.addTransition(0, 'a', 1);
   fa.addTransition(1, 'a', 3);
-  fa.addTransition(0, 'b', 3);
-  fa.addTransition(3, 'b', 4);
+  fa.addTransition(0, 'b', 2);
+  fa.addTransition(2, 'b', 4);
   fa.removeNonCoAccessibleStates();
-  EXPECT_EQ(fa.countSymbols(), 5u);
+  EXPECT_EQ(fa.countStates(), 5u);
   EXPECT_TRUE(fa.match("aa") && fa.match("bb"));
 }
 
