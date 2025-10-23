@@ -295,6 +295,14 @@ namespace fa {
   }
 
   bool Automaton::isLanguageEmpty() const {
+    std::unordered_set<int> visited;
+    for (const auto& state : states) {
+      if (state.second.isInitial) {
+        if (depthFirstSearch(state.first, visited, true)) {
+          return false;
+        }
+      }
+    }
     return true;
   }
 
