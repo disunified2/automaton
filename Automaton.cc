@@ -349,7 +349,11 @@ namespace fa {
   }
 
   bool Automaton::hasEmptyIntersectionWith(const Automaton& other) const {
-    return true;
+    Automaton intersection = createIntersection(*this, other);
+    if (intersection.isLanguageEmpty()) {
+      return true;
+    }
+    return false;
   }
 
   bool Automaton::isIncludedIn(const Automaton& other) const {
@@ -432,6 +436,7 @@ namespace fa {
 
 
   Automaton Automaton::createIntersection(const Automaton& lhs, const Automaton& rhs) {
+    // the goal is to go through both automats at the same time synchronously
     return lhs;
   }
 
