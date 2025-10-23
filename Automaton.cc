@@ -287,7 +287,33 @@ namespace fa {
   }
 
   void Automaton::removeNonAccessibleStates() {
+    std::unordered_set<int> visited;
+    // add all accessible states to the visited set
+    for (const auto& state : states) {
+      if (state.second.isInitial) {
+        depthFirstSearch(state.first, visited, false);
+      }
+    }
 
+    if (visited.size() == states.size()) {
+      return; // all states are accessible
+    }
+
+    // removing all states that aren't accessible
+    std::vector<int> states_to_remove;
+    for (const auto& state : states) {
+      if (visited.find(state.first) == visited.end()) {
+        states_to_remove.push_back(state.first);
+      }
+    }
+    for (auto state : states_to_remove) {
+      removeState(state);
+    }
+
+    if (states.empty()) {
+      addState(0);
+      setStateInitial(0);
+    }
   }
 
   void Automaton::removeNonCoAccessibleStates() {
