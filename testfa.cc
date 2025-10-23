@@ -1425,6 +1425,102 @@ TEST(AutomatonCreateIntersectionTest, noTransitions) {
   EXPECT_TRUE(intersection.isLanguageEmpty());
 }
 
+// Tests for hasEmptyIntersectionWith()
+TEST(AutomatonHasEmptyIntersectionWithTest, noInitialStates) {
+  fa::Automaton fa1;
+  fa1.addState(0);
+  fa1.addState(1);
+  fa1.setStateFinal(1);
+  fa1.addSymbol('a');
+  fa1.addSymbol('b');
+  fa1.addTransition(0, 'a', 1);
+  fa1.addTransition(1, 'a', 1);
+  fa1.addTransition(1, 'b', 1);
+
+  fa::Automaton fa2;
+  fa2.addState(0);
+  fa2.addState(1);
+  fa2.setStateFinal(1);
+  fa2.addSymbol('a');
+  fa2.addSymbol('b');
+  fa2.addTransition(0, 'a', 0);
+  fa2.addTransition(0, 'a', 1);
+  fa2.addTransition(1, 'a', 0);
+  fa2.addTransition(1, 'b', 1);
+
+  EXPECT_TRUE(fa1.hasEmptyIntersectionWith(fa2));
+}
+TEST(AutomatonHasEmptyIntersectionWithTest, noFinalStates) {
+  fa::Automaton fa1;
+  fa1.addState(0);
+  fa1.addState(1);
+  fa1.setStateInitial(0);
+  fa1.addSymbol('a');
+  fa1.addSymbol('b');
+  fa1.addTransition(0, 'a', 1);
+  fa1.addTransition(1, 'a', 1);
+  fa1.addTransition(1, 'b', 1);
+
+  fa::Automaton fa2;
+  fa2.addState(0);
+  fa2.addState(1);
+  fa2.setStateInitial(0);
+  fa2.addSymbol('a');
+  fa2.addSymbol('b');
+  fa2.addTransition(0, 'a', 0);
+  fa2.addTransition(0, 'a', 1);
+  fa2.addTransition(1, 'a', 0);
+  fa2.addTransition(1, 'b', 1);
+
+  EXPECT_TRUE(fa1.hasEmptyIntersectionWith(fa2));
+}
+TEST(AutomatonHasEmptyIntersectionWithTest, correctIntersection) {
+  fa::Automaton fa1;
+  fa1.addState(0);
+  fa1.addState(1);
+  fa1.setStateInitial(0);
+  fa1.setStateFinal(1);
+  fa1.addSymbol('a');
+  fa1.addSymbol('b');
+  fa1.addTransition(0, 'a', 1);
+  fa1.addTransition(1, 'a', 1);
+  fa1.addTransition(1, 'b', 1);
+
+  fa::Automaton fa2;
+  fa2.addState(0);
+  fa2.addState(1);
+  fa2.setStateInitial(0);
+  fa1.setStateFinal(1);
+  fa2.addSymbol('a');
+  fa2.addSymbol('b');
+  fa2.addTransition(0, 'a', 0);
+  fa2.addTransition(0, 'a', 1);
+  fa2.addTransition(1, 'a', 0);
+  fa2.addTransition(1, 'b', 1);
+
+  EXPECT_FALSE(fa1.hasEmptyIntersectionWith(fa2));
+}
+TEST(AutomatonHasEmptyIntersectionWithTest, noTransition) {
+  fa::Automaton fa1;
+  fa1.addState(0);
+  fa1.addState(1);
+  fa1.setStateInitial(0);
+  fa1.setStateFinal(1);
+  fa1.addSymbol('a');
+  fa1.addSymbol('b');
+  fa1.addTransition(0, 'a', 1);
+  fa1.addTransition(1, 'a', 1);
+  fa1.addTransition(1, 'b', 1);
+
+  fa::Automaton fa2;
+  fa2.addState(0);
+  fa2.setStateInitial(0);
+  fa2.setStateFinal(0);
+  fa2.addSymbol('a');
+
+  EXPECT_TRUE(fa1.hasEmptyIntersectionWith(fa2));
+}
+
 
 
 
