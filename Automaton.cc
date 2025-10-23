@@ -317,7 +317,23 @@ namespace fa {
   }
 
   void Automaton::removeNonCoAccessibleStates() {
+    std::vector<int> states_to_remove;
+    for (const auto& state : states) {
+      std::unordered_set<int> visited;
+      if(!depthFirstSearch(state.first, visited, true)) {
+        if (!state.second.isFinal) {
+          states_to_remove.push_back(state.first);
+        }
+      }
+    }
 
+    for (auto state : states_to_remove) {
+      removeState(state);
+    }
+
+    if (states.empty()) {
+      addState(0);
+    }
   }
 
   bool Automaton::isLanguageEmpty() const {
