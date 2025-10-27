@@ -1137,6 +1137,19 @@ TEST(AutomatonRemoveNonCoAccessibleStatesTest, singleFinalInitial) {
   EXPECT_TRUE(fa.countStates() == 1u);
   EXPECT_TRUE(fa.match("aaaa"));
 }
+TEST(AutomatonRemoveNonCoAccessibleStatesTest, finalNotConnected) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.setStateInitial(0);
+  fa.setStateFinal(2);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.removeNonCoAccessibleStates();
+  EXPECT_EQ(fa.countStates(), 3u);
+}
 
 // Tests for createMirror()
 TEST(AutomatonCreateMirrorTest, simpleAutomaton) {
