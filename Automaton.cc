@@ -5,6 +5,7 @@
 #include <list>
 #include <ostream>
 #include <stack>
+#include <vector>
 
 namespace fa {
 
