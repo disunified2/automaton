@@ -1413,19 +1413,21 @@ TEST(AutomatonCreateIntersectionTest, correctIntersection) {
   fa2.addState(0);
   fa2.addState(1);
   fa2.setStateInitial(0);
-  fa1.setStateFinal(1);
+  fa2.setStateFinal(1);
   fa2.addSymbol('a');
   fa2.addSymbol('b');
   fa2.addTransition(0, 'a', 0);
-  fa2.addTransition(0, 'a', 1);
+  fa2.addTransition(0, 'b', 1);
   fa2.addTransition(1, 'a', 0);
   fa2.addTransition(1, 'b', 1);
 
   fa::Automaton intersection = fa::Automaton::createIntersection(fa1, fa2);
   EXPECT_FALSE(intersection.isLanguageEmpty());
   EXPECT_TRUE(intersection.match("aabb"));
-  EXPECT_TRUE(fa1.match("aba") && !intersection.match("aba"));
-  EXPECT_TRUE(fa2.match("bb") && !intersection.match("bb"));
+  EXPECT_TRUE(fa1.match("aba"));
+  EXPECT_FALSE(intersection.match("aba"));
+  EXPECT_TRUE(fa2.match("bb"));
+  EXPECT_FALSE(intersection.match("bb"));
 }
 TEST(AutomatonCreateIntersectionTest, noTransitions) {
   fa::Automaton fa1;
