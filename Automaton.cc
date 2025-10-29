@@ -180,11 +180,11 @@ namespace fa {
 
     os << "Transitions :" << std::endl;
     for (const auto& state : states) {
-      os << "\tFor state " << state.first << ":" << std::endl;
-      for (const auto& symbol : symbols) {
-        os << "\t\tFor letter " << symbol << ": ";
-        for (const auto& symbol2 : state.second.transitions) {
-          for (const auto& state2 : symbol2.second) {
+      os << "\tFor state " << state.first << " :" << std::endl;
+      for (const auto symbol : symbols) {
+        os << "\t\tFor letter " << symbol << " : ";
+        for (const auto& state2 : states) {
+          if (hasTransition(state.first, symbol, state2.first)) {
             os << state2.first << " ";
           }
         }
