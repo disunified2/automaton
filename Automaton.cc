@@ -165,7 +165,32 @@ namespace fa {
 
 
   void Automaton::prettyPrint(std::ostream &os) const {
+    os << "Initial states :" << std::endl;
+    for (const auto& state : states) {
+      if (state.second.isInitial) {
+        os << "\t" << state.first << " " << std::endl;
+      }
+    }
+    os << "Final states :" << std::endl;
+    for (const auto& state : states) {
+      if (state.second.isFinal) {
+        os << "\t" << state.first << " " << std::endl;
+      }
+    }
 
+    os << "Transitions :" << std::endl;
+    for (const auto& state : states) {
+      os << "\tFor state " << state.first << ":" << std::endl;
+      for (const auto& symbol : symbols) {
+        os << "\t\tFor letter " << symbol << ": ";
+        for (const auto& symbol2 : state.second.transitions) {
+          for (const auto& state2 : symbol2.second) {
+            os << state2.first << " ";
+          }
+        }
+        os << std::endl;
+      }
+    }
   }
 
 
