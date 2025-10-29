@@ -468,7 +468,7 @@ namespace fa {
 
     // Symbols
     std::unordered_set<char> shared_symbols;
-    for (const auto symbol : lhs.symbols) {
+    for (const char symbol : lhs.symbols) {
       if (rhs.hasSymbol(symbol)) {
         shared_symbols.insert(symbol);
       }
@@ -485,8 +485,8 @@ namespace fa {
 
     std::map<std::pair<int, int>, int> pairs;
     std::queue<std::pair<int, int>> queue;
-
     int stateID = 0;
+
     // going through both automats to find the initial pairs
     for (const auto& l_state : lhs.states) {
       if (l_state.second.isInitial) {
@@ -498,14 +498,15 @@ namespace fa {
 
             // Checking to see if its not already in our pairs map
             if (pairs.find(newPair) == pairs.end()) {
+              // Add to the list of pairs
               pairs[newPair] = stateID++;
 
               // inserting new pair into result
-              intersection.addState(newPair.second);
-              intersection.setStateInitial(newPair.second);
+              intersection.addState(pairs[newPair]);
+              intersection.setStateInitial(pairs[newPair]);
 
               if (l_state.second.isFinal && r_state.second.isFinal) {
-                intersection.setStateFinal(newPair.second);
+                intersection.setStateFinal(pairs[newPair]);
               }
 
               // Add the pair to the queue for makeTransition after
@@ -529,21 +530,21 @@ namespace fa {
       int currentStateID = pairs[statePair];
 
       // Go through the common symbols
-      for (auto symbol : intersection.symbols) {
+      for (char symbol : intersection.symbols) {
         std::set<int> l_states = lhs.makeTransition({statePair.first}, symbol);
         std::set<int> r_states = rhs.makeTransition({statePair.second}, symbol);
 
         // Like above, create the pairs with what is obtained
-        for (auto l_state : l_states) {
-          for (auto r_state : r_states) {
+        for (int l_state : l_states) {
+          for (int r_state : r_states) {
             auto newPair = std::make_pair(l_state, r_state);
             if (pairs.find(newPair) == pairs.end()) {
               pairs[newPair] = stateID++;
 
-              intersection.addState(newPair.second);
+              intersection.addState(pairs[newPair]);
 
               if (lhs.isStateFinal(l_state) && rhs.isStateFinal(r_state)) {
-                intersection.setStateFinal(newPair.second);
+                intersection.setStateFinal(pairs[newPair]);
               }
 
               queue.push(newPair);
