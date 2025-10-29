@@ -1538,11 +1538,11 @@ TEST(AutomatonHasEmptyIntersectionWithTest, correctIntersection) {
   fa2.addState(0);
   fa2.addState(1);
   fa2.setStateInitial(0);
-  fa1.setStateFinal(1);
+  fa2.setStateFinal(1);
   fa2.addSymbol('a');
   fa2.addSymbol('b');
   fa2.addTransition(0, 'a', 0);
-  fa2.addTransition(0, 'a', 1);
+  fa2.addTransition(0, 'b', 1);
   fa2.addTransition(1, 'a', 0);
   fa2.addTransition(1, 'b', 1);
 
