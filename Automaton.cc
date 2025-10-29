@@ -438,7 +438,100 @@ namespace fa {
 
   Automaton Automaton::createIntersection(const Automaton& lhs, const Automaton& rhs) {
     // the goal is to go through both automats at the same time synchronously
-    return lhs;
+    // the challenge is to find a way of saving the visited states into a pair -> map of pairs
+    Automaton intersection;
+
+    // Symbols
+    std::unordered_set<char> shared_symbols;
+    for (const auto symbol : lhs.symbols) {
+      if (rhs.hasSymbol(symbol)) {
+        shared_symbols.insert(symbol);
+      }
+    }
+    if (shared_symbols.empty()) {
+      intersection.addState(0);
+      intersection.addSymbol('a');
+      return intersection;
+    }
+
+    intersection.symbols.insert(shared_symbols.begin(), shared_symbols.end());
+
+    // States
+
+    std::map<std::pair<int, int>, int> pairs;
+    std::queue<std::pair<int, int>> queue;
+
+    int stateID = 0;
+    // going through both automats to find the initial pairs
+    for (const auto& l_state : lhs.states) {
+      if (l_state.second.isInitial) {
+        for (const auto& r_state : rhs.states) {
+          if (r_state.second.isInitial) {
+
+            // Creating the pair that will become one single state in result automat
+            auto newPair = std::make_pair(l_state.first, r_state.first);
+
+            // Checking to see if its not already in our pairs map
+            if (pairs.find(newPair) == pairs.end()) {
+              pairs[newPair] = stateID++;
+
+              // inserting new pair into result
+              intersection.addState(newPair.second);
+              intersection.setStateInitial(newPair.second);
+
+              if (l_state.second.isFinal && r_state.second.isFinal) {
+                intersection.setStateFinal(newPair.second);
+              }
+
+              // Add the pair to the queue for makeTransition after
+              queue.push(newPair);
+            }
+          }
+        }
+      }
+    }
+
+    // Case where there is no initial pairs
+    if (pairs.empty()) {
+      intersection.addState(0);
+      return intersection;
+    }
+
+    // Go through the queue to add all transitions between the initial states and the others
+    while (!queue.empty()) {
+      auto statePair = queue.front();
+      queue.pop();
+      int currentStateID = pairs[statePair];
+
+      // Go through the common symbols
+      for (auto symbol : intersection.symbols) {
+        std::set<int> l_states = lhs.makeTransition({statePair.first}, symbol);
+        std::set<int> r_states = rhs.makeTransition({statePair.second}, symbol);
+
+        // Like above, create the pairs with what is obtained
+        for (auto l_state : l_states) {
+          for (auto r_state : r_states) {
+            auto newPair = std::make_pair(l_state, r_state);
+            if (pairs.find(newPair) == pairs.end()) {
+              pairs[newPair] = stateID++;
+
+              intersection.addState(newPair.second);
+
+              if (lhs.isStateFinal(l_state) && rhs.isStateFinal(r_state)) {
+                intersection.setStateFinal(newPair.second);
+              }
+
+              queue.push(newPair);
+            }
+
+            // Add the transition between the current pair and the new found pair
+            intersection.addTransition(currentStateID, symbol, pairs[newPair]);
+          }
+        }
+      }
+    }
+
+    return intersection;
   }
 
   Automaton Automaton::createDeterministic(const Automaton& other) {
