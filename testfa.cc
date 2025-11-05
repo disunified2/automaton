@@ -1569,7 +1569,63 @@ TEST(AutomatonHasEmptyIntersectionWithTest, noTransition) {
   EXPECT_TRUE(fa1.hasEmptyIntersectionWith(fa2));
 }
 
-
+// Tests for createDeterministic()
+TEST(AutomatonCreateDeterministicTest, alreadyDeterministic) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateInitial(0);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'a', 0);
+  fa::Automaton deterministic = fa::Automaton::createDeterministic(fa);
+  EXPECT_TRUE(deterministic.isDeterministic());
+  EXPECT_EQ(deterministic.countSymbols(), fa.countSymbols());
+  EXPECT_TRUE(deterministic.hasSymbol('a'));
+}
+TEST(AutomatonCreateDeterministicTest, noInitialStates) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'a', 0);
+  fa::Automaton deterministic = fa::Automaton::createDeterministic(fa);
+  EXPECT_TRUE(deterministic.isDeterministic());
+  EXPECT_TRUE(deterministic.isLanguageEmpty());
+}
+TEST(AutomatonCreateDeterministicTest, noFinalStates) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateInitial(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'a', 0);
+  fa::Automaton deterministic = fa::Automaton::createDeterministic(fa);
+  EXPECT_TRUE(deterministic.isDeterministic());
+  EXPECT_TRUE(deterministic.isLanguageEmpty());
+}
+TEST(AutomatonCreateDeterministicTest, determinisationNeeded) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateInitial(0);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'a', 0);
+  fa.addTransition(0, 'a', 1);
+  fa.addTransition(1, 'b', 1);
+  EXPECT_TRUE(fa.match("aaabbbb") && fa.match("a"));
+  EXPECT_FALSE(fa.isDeterministic());
+  fa::Automaton deterministic = fa::Automaton::createDeterministic(fa);
+  EXPECT_TRUE(deterministic.isDeterministic());
+  EXPECT_TRUE(deterministic.match("aaabbbb") && deterministic.match("a"));
+  EXPECT_TRUE(deterministic.hasSymbol('a') && deterministic.hasSymbol('b'));
+}
 
 
 
