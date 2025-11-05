@@ -383,7 +383,11 @@ namespace fa {
   }
 
   bool Automaton::isIncludedIn(const Automaton& other) const {
-    return true;
+    Automaton complement = createComplement(other);
+    if (hasEmptyIntersectionWith(complement)) {
+      return true;
+    }
+    return false;
   }
 
 
@@ -564,7 +568,23 @@ namespace fa {
     if (other.isDeterministic()) {
       return other;
     }
-    return other;
+
+    Automaton deterministic;
+
+    if (other.isLanguageEmpty()) {
+      deterministic.addState(0);
+      deterministic.setStateInitial(0);
+      deterministic.addSymbol('a');
+      return deterministic;
+    }
+
+    for (const char symbol : other.symbols) {
+      deterministic.addSymbol(symbol);
+    }
+
+
+
+    return deterministic;
   }
 
 
