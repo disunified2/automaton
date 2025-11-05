@@ -571,18 +571,64 @@ namespace fa {
 
     Automaton deterministic;
 
-    if (other.isLanguageEmpty()) {
-      deterministic.addState(0);
-      deterministic.setStateInitial(0);
-      deterministic.addSymbol('a');
-      return deterministic;
-    }
-
     for (const char symbol : other.symbols) {
       deterministic.addSymbol(symbol);
     }
 
+    if (other.isLanguageEmpty()) {
+      deterministic.addState(0);
+      deterministic.setStateInitial(0);
+      return deterministic;
+    }
 
+    std::map<std::set<int>, int> det_states;
+    int state_ID = 0;
+    std::queue<std::set<int>> queue;
+
+    std::set<int> initials;
+    // Add the initial states int the states to add
+    for (const auto& state : other.states) {
+      if (state.second.isInitial) {
+        initials.insert(state.first);
+      }
+    }
+    queue.push(initials);
+    det_states[initials] = state_ID;
+    deterministic.addState(det_states[initials]);
+    deterministic.setStateInitial(det_states[initials]);
+
+    while (!queue.empty()) {
+      auto current_set = queue.front();
+      queue.pop();
+
+      for (char symbol : other.symbols) {
+        // Find the next states from the current ones
+        std::set<int> next_set = other.makeTransition(current_set, symbol);
+        // There are no transitions with this symbol
+        if (next_set.empty()) {
+          continue;
+        }
+
+        // If the new set is not in the deterministic states, then add it
+        if (det_states.find(next_set) == det_states.end()) {
+          det_states[next_set] = state_ID++;
+          queue.push(next_set);
+          deterministic.addState(det_states[next_set]);
+        }
+
+        // Add the transition in the deterministic automat
+        deterministic.addTransition(det_states[current_set], symbol, det_states[next_set]);
+      }
+    }
+
+    // Find the final states
+    for (auto& set : det_states) {
+      for (int state : set.first) {
+        if (other.isStateFinal(state)) {
+         deterministic.setStateFinal(det_states[set.first]);
+        }
+      }
+    }
 
     return deterministic;
   }
