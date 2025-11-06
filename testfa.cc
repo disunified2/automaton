@@ -1627,6 +1627,73 @@ TEST(AutomatonCreateDeterministicTest, determinisationNeeded) {
   EXPECT_TRUE(deterministic.hasSymbol('a') && deterministic.hasSymbol('b'));
 }
 
+// Tests for isIncludedIn()
+TEST(AutomatonIsIncludedInTest, emptyLanguage) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.setStateInitial(0);
+  fa.setStateFinal(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+
+  fa::Automaton fa2;
+  fa2.addState(0);
+  fa2.addSymbol('b');
+
+  EXPECT_TRUE(fa.isIncludedIn(fa2));
+  EXPECT_TRUE(fa2.isIncludedIn(fa));
+}
+TEST(AutomatonIsIncludedInTest, self) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.setStateInitial(0);
+  fa.setStateFinal(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+  EXPECT_TRUE(fa.isIncludedIn(fa));
+}
+// Check if fails
+TEST(AutomatonIsIncludedInTest, nonEmptyLanguage) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+
+  fa::Automaton fa2;
+  fa2.addState(0);
+  fa2.addState(1);
+  fa2.addState(2);
+  fa2.setStateInitial(0);
+  fa2.setStateFinal(2);
+  fa2.addSymbol('b');
+  fa2.addTransition(0, 'b', 1);
+  fa2.addTransition(1, 'b', 2);
+
+  EXPECT_FALSE(fa.isIncludedIn(fa2));
+}
+// Check if fails
+TEST(AutomatonIsIncludedInTest, includedIn) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.setStateInitial(0);
+  fa.setStateFinal(1);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 1);
+
+  fa::Automaton fa2;
+  fa2.addState(0);
+  fa2.addState(1);
+  fa2.setStateInitial(0);
+  fa2.setStateFinal(1);
+  fa2.addSymbol('a');
+  fa2.addSymbol('b');
+  fa2.addTransition(0, 'a', 1);
+  fa2.addTransition(1, 'b', 1);
+
+  EXPECT_TRUE(fa.isIncludedIn(fa2));
+  EXPECT_FALSE(fa2.isIncludedIn(fa));
+}
+
 
 
 
