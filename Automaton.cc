@@ -634,6 +634,13 @@ namespace fa {
 
 
   Automaton Automaton::createMinimalMoore(const Automaton& other) {
+    Automaton minimal = other;
+    minimal = createDeterministic(minimal);
+    minimal = createComplete(minimal);
+
+    // Computation
+
+
     return other;
   }
 
@@ -646,7 +653,7 @@ namespace fa {
     minimal = createMirror(minimal);
     minimal = createDeterministic(minimal);
 
-    minimal = createComplete(minimal);
+    minimal = createComplete(minimal); // Could require this line
 
     return minimal;
   }
