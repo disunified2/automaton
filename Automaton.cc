@@ -6,6 +6,7 @@
 #include <ostream>
 #include <stack>
 #include <vector>
+#include <queue>
 
 namespace fa {
 
@@ -586,7 +587,7 @@ namespace fa {
     std::queue<std::set<int>> queue;
 
     std::set<int> initials;
-    // Add the initial states int the states to add
+    // Add the initial states into the states to add
     for (const auto& state : other.states) {
       if (state.second.isInitial) {
         initials.insert(state.first);
