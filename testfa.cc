@@ -1694,6 +1694,59 @@ TEST(AutomatonIsIncludedInTest, includedIn) {
   EXPECT_FALSE(fa2.isIncludedIn(fa));
 }
 
+// Tests for createMinimalMoore()
+TEST(AutomatonCreateMinimalMooreTest, emptyAutomaton) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+
+  fa::Automaton minimal = fa::Automaton::createMinimalMoore(fa);
+
+  EXPECT_TRUE(minimal.isLanguageEmpty());
+  EXPECT_TRUE(minimal.isIncludedIn(fa) && fa.isIncludedIn(minimal));
+}
+TEST(AutomatonCreateMinimalMooreTest, alreadyMinimal) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.setStateInitial(0);
+  fa.setStateFinal(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+
+  fa::Automaton minimal = fa::Automaton::createMinimalMoore(fa);
+
+  EXPECT_FALSE(minimal.isLanguageEmpty());
+  EXPECT_TRUE(minimal.isIncludedIn(fa) && fa.isIncludedIn(minimal));
+  EXPECT_TRUE(minimal.match("aaa") && fa.match("aaa"));
+}
+
+// Tests for createMinimalBrzozowski
+TEST(AutomatonCreateMinimalBrzozowskiTest, emptyAutomaton) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+
+  fa::Automaton minimal = fa::Automaton::createMinimalBrzozowski(fa);
+
+  EXPECT_TRUE(minimal.isLanguageEmpty());
+  EXPECT_TRUE(minimal.isIncludedIn(fa) && fa.isIncludedIn(minimal));
+}
+TEST(AutomatonCreateMinimalBrzozowskiTest, alreadyMinimal) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.setStateInitial(0);
+  fa.setStateFinal(0);
+  fa.addSymbol('a');
+  fa.addTransition(0, 'a', 0);
+
+  fa::Automaton minimal = fa::Automaton::createMinimalBrzozowski(fa);
+
+  EXPECT_FALSE(minimal.isLanguageEmpty());
+  EXPECT_TRUE(minimal.isIncludedIn(fa) && fa.isIncludedIn(minimal));
+  EXPECT_TRUE(minimal.match("aaa") && fa.match("aaa"));
+  EXPECT_EQ(minimal.countSymbols(), 1u);
+  EXPECT_EQ(minimal.countStates(), 1u);
+}
 
 
 
