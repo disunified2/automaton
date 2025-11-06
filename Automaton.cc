@@ -638,7 +638,17 @@ namespace fa {
   }
 
   Automaton Automaton::createMinimalBrzozowski(const Automaton& other) {
-    return other;
+    Automaton minimal = other;
+
+    minimal = createMirror(minimal);
+    minimal = createDeterministic(minimal);
+
+    minimal = createMirror(minimal);
+    minimal = createDeterministic(minimal);
+
+    minimal = createComplete(minimal);
+
+    return minimal;
   }
 }
 
