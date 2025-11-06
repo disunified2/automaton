@@ -377,18 +377,14 @@ namespace fa {
 
   bool Automaton::hasEmptyIntersectionWith(const Automaton& other) const {
     Automaton intersection = createIntersection(*this, other);
-    if (intersection.isLanguageEmpty()) {
-      return true;
-    }
-    return false;
+    return intersection.isLanguageEmpty();
   }
 
   bool Automaton::isIncludedIn(const Automaton& other) const {
-    Automaton complement = createComplement(other);
-    if (hasEmptyIntersectionWith(complement)) {
-      return true;
-    }
-    return false;
+    Automaton complement = other;
+    // complement = createDeterministic(complement);
+    complement = createComplement(complement);
+    return hasEmptyIntersectionWith(complement);
   }
 
 
@@ -454,7 +450,7 @@ namespace fa {
 
   Automaton Automaton::createComplement(const Automaton& automaton) {
     Automaton complement = automaton;
-    complement = createDeterministic(automaton);
+    complement = createDeterministic(complement);
     complement = createComplete(complement);
 
     for (const auto& state : complement.states) {
@@ -594,7 +590,7 @@ namespace fa {
       }
     }
     queue.push(initials);
-    det_states[initials] = state_ID;
+    det_states[initials] = state_ID++;
     deterministic.addState(det_states[initials]);
     deterministic.setStateInitial(det_states[initials]);
 
@@ -627,6 +623,7 @@ namespace fa {
       for (int state : set.first) {
         if (other.isStateFinal(state)) {
          deterministic.setStateFinal(det_states[set.first]);
+          break;
         }
       }
     }
