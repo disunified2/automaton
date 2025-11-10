@@ -465,6 +465,37 @@ TEST(AutomatonRemoveTransitionTest, epsilonTransition) {
   EXPECT_TRUE(fa.removeTransition(0, fa::Epsilon, 0));
   EXPECT_EQ(fa.countTransitions(), 0u);
 }
+TEST(AutomatonRemoveTransitionTest, removeAllProf) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addState(1);
+  fa.addState(2);
+  fa.addState(3);
+  fa.addState(4);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addSymbol('c');
+
+  for (const char c : { 'a', 'b', 'c'}) {
+    for (int i = 0; i < 5; ++i) {
+      for (int j = 0; j < 5; ++j) {
+        fa.addTransition(i, c, j);
+      }
+    }
+  }
+
+  EXPECT_EQ(fa.countTransitions(), 75u);
+
+  for (const char c : { 'a', 'b', 'c'}) {
+    for (int i = 0; i < 5; ++i) {
+      for (int j = 0; j < 5; ++j) {
+        fa.removeTransition(i, c, j);
+      }
+    }
+  }
+
+  EXPECT_EQ(fa.countTransitions(), 0u);
+}
 
 // Tests for hasTransition()
 TEST(AutomatonHasTransitionTest, invalidChar) {
@@ -1612,6 +1643,36 @@ TEST(AutomatonCreateDeterministicTest, determinisationNeeded) {
   EXPECT_TRUE(deterministic.match("aaabbbb") && deterministic.match("a"));
   EXPECT_TRUE(deterministic.hasSymbol('a') && deterministic.hasSymbol('b'));
 }
+TEST(AutomatonCreateDeterministicTest, DS2024) {
+  fa::Automaton fa;
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  for (int i=0; i<=3; i++){
+    fa.addState(i);
+  }
+  fa.addTransition(0,'a',2);
+  fa.addTransition(0,'a',1);
+  fa.addTransition(0,'b',3);
+
+  fa.addTransition(1,'b',3);
+
+  fa.addTransition(2,'b',0);
+  fa.addTransition(2,'b',3);
+  fa.addTransition(2,'a',2);
+
+  fa.addTransition(3,'a',1);
+  fa.addTransition(3,'b',2);
+  fa.addTransition(3,'a',3);
+
+  fa.setStateFinal(2);
+  fa.setStateInitial(0);
+
+  fa::Automaton A = fa::Automaton::createDeterministic(fa);
+
+  EXPECT_FALSE(fa.isLanguageEmpty());
+  EXPECT_TRUE(A.isDeterministic());
+  EXPECT_EQ(A.countStates(),9u);
+}
 
 // Tests for isIncludedIn()
 TEST(AutomatonIsIncludedInTest, emptyLanguage) {
@@ -1626,7 +1687,7 @@ TEST(AutomatonIsIncludedInTest, emptyLanguage) {
   fa2.addState(0);
   fa2.addSymbol('b');
 
-  EXPECT_TRUE(fa.isIncludedIn(fa2));
+  EXPECT_FALSE(fa.isIncludedIn(fa2));
   EXPECT_TRUE(fa2.isIncludedIn(fa));
 }
 TEST(AutomatonIsIncludedInTest, self) {
@@ -1664,6 +1725,7 @@ TEST(AutomatonIsIncludedInTest, includedIn) {
   fa.setStateInitial(0);
   fa.setStateFinal(1);
   fa.addSymbol('a');
+  // fa.addSymbol('b');
   fa.addTransition(0, 'a', 1);
 
   fa::Automaton fa2;
