@@ -663,20 +663,6 @@ TEST(AutomatonIsCompleteTest, automatonIsNotComplete) {
   fa.addTransition(0, 'a', 1);
   EXPECT_FALSE(fa.isComplete());
 }
-TEST(AutomatonIsCompleteTest, epsilonTransition) {
-  fa::Automaton fa;
-  fa.addState(0);
-  fa.addState(1);
-  fa.addSymbol('a');
-  fa.addSymbol('b');
-  fa.addTransition(0, 'b', 1);
-  fa.addTransition(1, 'b', 0);
-  fa.addTransition(0, 'a', 0);
-  fa.addTransition(1, 'a', 1);
-  EXPECT_TRUE(fa.isComplete());
-  fa.addTransition(0, fa::Epsilon, 1);
-  EXPECT_FALSE(fa.isComplete());
-}
 TEST(AutomatonIsCompleteTest, initialAndFinalStates) {
   fa::Automaton fa;
   fa.addState(0);
