@@ -136,7 +136,7 @@ namespace fa {
     auto temp = states[from].transitions[alpha];
     temp.erase(to);
     if (temp.empty()) {
-      temp.erase(alpha);
+      states[from].transitions.erase(alpha);
     }
     return true;
   }
