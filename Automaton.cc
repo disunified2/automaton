@@ -133,9 +133,10 @@ namespace fa {
     if (!hasTransition(from, alpha, to)) {
       return false;
     }
-    states[from].transitions[alpha].erase(to);
-    if (states[from].transitions[alpha].empty()) {
-      states[from].transitions.erase(alpha);
+    auto temp = states[from].transitions;
+    temp[alpha].erase(to);
+    if (temp[alpha].empty()) {
+      temp.erase(alpha);
     }
     return true;
   }
@@ -474,6 +475,9 @@ namespace fa {
         shared_symbols.insert(symbol);
       }
     }
+    // for (const char symbol : rhs.symbols) {
+    //   shared_symbols.insert(symbol);
+    // }
     if (shared_symbols.empty()) {
       intersection.addState(0);
       intersection.addSymbol('a');
@@ -654,6 +658,9 @@ namespace fa {
     minimal = createDeterministic(minimal);
 
     minimal = createComplete(minimal); // Could require this line
+
+    minimal.removeNonAccessibleStates();
+    minimal.removeNonCoAccessibleStates();
 
     return minimal;
   }
