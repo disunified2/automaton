@@ -1667,11 +1667,12 @@ TEST(AutomatonCreateDeterministicTest, DS2024) {
   fa.setStateFinal(2);
   fa.setStateInitial(0);
 
-  fa::Automaton A = fa::Automaton::createDeterministic(fa);
+  fa::Automaton deterministic = fa::Automaton::createDeterministic(fa);
 
   EXPECT_FALSE(fa.isLanguageEmpty());
-  EXPECT_TRUE(A.isDeterministic());
-  EXPECT_EQ(A.countStates(),9u);
+  EXPECT_TRUE(deterministic.isDeterministic());
+  EXPECT_EQ(deterministic.countStates(),9u);
+  EXPECT_TRUE(fa.isIncludedIn(deterministic) && deterministic.isIncludedIn(fa));
 }
 
 // Tests for isIncludedIn()
