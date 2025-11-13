@@ -1675,7 +1675,7 @@ TEST(AutomatonCreateDeterministicTest, DS2024) {
 }
 
 // Tests for isIncludedIn()
-TEST(AutomatonIsIncludedInTest, emptyLanguage) {
+TEST(AutomatonIsIncludedInTest, emptyLanguage) { // Could fail
   fa::Automaton fa;
   fa.addState(0);
   fa.setStateInitial(0);
@@ -1740,6 +1740,31 @@ TEST(AutomatonIsIncludedInTest, includedIn) {
 
   EXPECT_TRUE(fa.isIncludedIn(fa2));
   EXPECT_FALSE(fa2.isIncludedIn(fa));
+}
+TEST(AutomatonIsIncludedInTest, specialCase) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.setStateInitial(0);
+  fa.setStateFinal(0);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addSymbol('c');
+  fa.addTransition(0, 'a', 0);
+  fa.addTransition(0, 'b', 0);
+  fa.addTransition(0, 'c', 0);
+
+  fa::Automaton fa2;
+  fa2.addState(0);
+  fa2.setStateInitial(0);
+  fa2.setStateFinal(0);
+  fa2.addSymbol('a');
+  fa2.addSymbol('b');
+  fa2.addSymbol('d');
+  fa2.addTransition(0, 'a', 0);
+  fa2.addTransition(0, 'b', 0);
+  fa2.addTransition(0, 'd', 0);
+
+  EXPECT_FALSE(fa.isIncludedIn(fa2));
 }
 
 // Tests for createMinimalMoore()
