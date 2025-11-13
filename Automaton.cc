@@ -650,7 +650,7 @@ namespace fa {
     // Computation
 
 
-    return other;
+    return minimal;
   }
 
   Automaton Automaton::createMinimalBrzozowski(const Automaton& other) {
