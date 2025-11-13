@@ -303,7 +303,7 @@ namespace fa {
         visited.insert(current);
         for (const auto& it : states.find(current)->second.transitions) {
           for (const auto& it2 : it.second) {
-            if (return_ && it2.second.isFinal) {
+            if (return_ && states.at(it2.first).isFinal) {
               return true;
             }
             stack.push(it2.first);
