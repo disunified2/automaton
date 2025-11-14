@@ -1716,7 +1716,7 @@ TEST(AutomatonIsIncludedInTest, nonEmptyLanguage) {
   fa2.addTransition(0, 'b', 1);
   fa2.addTransition(1, 'b', 2);
 
-  EXPECT_FALSE(fa.isIncludedIn(fa2));
+  EXPECT_TRUE(fa.isIncludedIn(fa2));
 }
 // Check if fails
 TEST(AutomatonIsIncludedInTest, includedIn) {

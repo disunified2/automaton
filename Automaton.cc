@@ -382,6 +382,9 @@ namespace fa {
   }
 
   bool Automaton::isIncludedIn(const Automaton& other) const {
+    if (isLanguageEmpty()) {
+      return true;
+    }
     for (const auto& symbol : symbols) {
       if (other.symbols.find(symbol) == other.symbols.end()) {
         return false;
