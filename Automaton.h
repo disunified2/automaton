@@ -236,7 +236,7 @@ namespace fa {
       int state;
       bool isFinal;
       bool isInitial;
-      std::map<char, std::map<int, State>> transitions;
+      std::map<char, std::set<int>> transitions;
     };
 
     std::map<int, State> states;
