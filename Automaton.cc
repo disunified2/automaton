@@ -36,7 +36,7 @@ namespace fa {
     for (auto it : states) {
       for (auto it2 : it.second.transitions) {
         for (auto it3 : it2.second) {
-          removeTransition(it.first, symbol, it3.first);
+          removeTransition(it.first, symbol, states.find(it3)->first);
         }
       }
     }
@@ -76,9 +76,7 @@ namespace fa {
     }
     for (auto it : states) {
       for (auto it2 : it.second.transitions) {
-        for (auto it3 : it2.second) {
-          removeTransition(it.first, it2.first, state);
-        }
+        removeTransition(it.first, it2.first, state);
       }
     }
     return states.erase(state);
@@ -120,7 +118,7 @@ namespace fa {
     if (!hasState(from) || !hasState(to) || (!hasSymbol(alpha) && alpha != fa::Epsilon)) {
       return false;
     }
-    if (!states[from].transitions[alpha].insert(std::pair<int, State>(to, states[to])).second) {
+    if (!states[from].transitions[alpha].insert(to).second) {
       return false;
     }
     return true;
@@ -251,9 +249,9 @@ namespace fa {
 
     for (auto it : origin) {
       if (hasState(it) && states.find(it)->second.transitions.find(alpha) != states.find(it)->second.transitions.end()) {
-        std::map<int, State> arrival_states = states.find(it)->second.transitions.find(alpha)->second;
-        for (const auto& it2 : arrival_states) {
-          result.insert(it2.first);
+        std::set<int> arrival_states = states.find(it)->second.transitions.find(alpha)->second;
+        for (const int it2 : arrival_states) {
+          result.insert(it2);
         }
       }
     }
@@ -303,10 +301,10 @@ namespace fa {
         visited.insert(current);
         for (const auto& it : states.find(current)->second.transitions) {
           for (const auto& it2 : it.second) {
-            if (return_ && states.at(it2.first).isFinal) {
+            if (return_ && states.at(it2).isFinal) {
               return true;
             }
-            stack.push(it2.first);
+            stack.push(it2);
           }
         }
       }
@@ -421,7 +419,7 @@ namespace fa {
     for (auto& state : automaton.states) {
       for (auto& symbol : state.second.transitions) {
         for (auto& state2 : symbol.second) {
-          mirror.addTransition(state2.first, symbol.first, state.first);
+          mirror.addTransition(state2, symbol.first, state.first);
         }
       }
     }
