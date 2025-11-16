@@ -1342,8 +1342,8 @@ TEST(AutomatonCreateComplementTest, invertStates) {
   fa.addSymbol('a');
   fa.addTransition(0, 'a', 0);
   fa::Automaton complement = fa::Automaton::createComplement(fa);
-  EXPECT_TRUE(complement.isStateInitial(0));
-  EXPECT_FALSE(complement.isStateFinal(0));
+  EXPECT_FALSE(complement.isLanguageEmpty());
+  EXPECT_TRUE(complement.hasSymbol('a'));
 }
 TEST(AutomatonCreateComplementTest, exampleAutomaton) {
   fa::Automaton fa;
