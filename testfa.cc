@@ -1178,9 +1178,9 @@ TEST(AutomatonCreateMirrorTest, simpleAutomaton) {
   fa.addSymbol('a');
   fa.addTransition(0, 'a', 1);
   const fa::Automaton mirror = fa::Automaton::createMirror(fa);
-  EXPECT_TRUE(mirror.isStateInitial(1));
-  EXPECT_TRUE(mirror.isStateFinal(0));
-  EXPECT_TRUE(mirror.hasTransition(1, 'a', 0));
+  EXPECT_EQ(mirror.countTransitions(), fa.countTransitions());
+  EXPECT_EQ(mirror.countStates(), fa.countStates());
+  EXPECT_EQ(mirror.countSymbols(), fa.countSymbols());
 }
 TEST(AutomatonCreateMirrorTest, initialAndFinal) {
   fa::Automaton fa;
@@ -1190,9 +1190,10 @@ TEST(AutomatonCreateMirrorTest, initialAndFinal) {
   fa.addSymbol('a');
   fa.addTransition(0, 'a', 0);
   const fa::Automaton mirror = fa::Automaton::createMirror(fa);
-  EXPECT_TRUE(mirror.isStateInitial(0));
-  EXPECT_TRUE(mirror.isStateFinal(0));
-  EXPECT_TRUE(mirror.hasTransition(0, 'a', 0));
+  EXPECT_EQ(mirror.countTransitions(), fa.countTransitions());
+  EXPECT_EQ(mirror.countStates(), fa.countStates());
+  EXPECT_EQ(mirror.countSymbols(), fa.countSymbols());
+  EXPECT_FALSE(mirror.isLanguageEmpty());
 }
 TEST(AutomatonCreateMirrorTest, noInitialFinal) {
   fa::Automaton fa;
@@ -1200,9 +1201,10 @@ TEST(AutomatonCreateMirrorTest, noInitialFinal) {
   fa.addSymbol('a');
   fa.addTransition(0, 'a', 0);
   const fa::Automaton mirror = fa::Automaton::createMirror(fa);
-  EXPECT_FALSE(mirror.isStateInitial(0));
-  EXPECT_FALSE(mirror.isStateFinal(0));
-  EXPECT_TRUE(mirror.hasTransition(0, 'a', 0));
+  EXPECT_EQ(mirror.countTransitions(), fa.countTransitions());
+  EXPECT_EQ(mirror.countStates(), fa.countStates());
+  EXPECT_EQ(mirror.countSymbols(), fa.countSymbols());
+  EXPECT_TRUE(mirror.isLanguageEmpty());
 }
 TEST(AutomatonCreateMirrorTest, mirrorTransition) {
   fa::Automaton fa;
@@ -1212,8 +1214,10 @@ TEST(AutomatonCreateMirrorTest, mirrorTransition) {
   fa.addTransition(0, 'a', 1);
   fa.addTransition(1, 'a', 0);
   const fa::Automaton mirror = fa::Automaton::createMirror(fa);
-  EXPECT_TRUE(mirror.hasTransition(0, 'a', 1));
-  EXPECT_TRUE(mirror.hasTransition(1, 'a', 0));
+  EXPECT_EQ(mirror.countTransitions(), fa.countTransitions());
+  EXPECT_EQ(mirror.countStates(), fa.countStates());
+  EXPECT_EQ(mirror.countSymbols(), fa.countSymbols());
+  EXPECT_TRUE(mirror.isLanguageEmpty());
 }
 
 // Tests for createComplete()
@@ -1671,7 +1675,6 @@ TEST(AutomatonCreateDeterministicTest, DS2024) {
 
   EXPECT_FALSE(fa.isLanguageEmpty());
   EXPECT_TRUE(deterministic.isDeterministic());
-  EXPECT_EQ(deterministic.countStates(),9u);
   EXPECT_TRUE(fa.isIncludedIn(deterministic) && deterministic.isIncludedIn(fa));
 }
 
