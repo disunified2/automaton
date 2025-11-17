@@ -1257,6 +1257,13 @@ TEST(AutomatonCreateCompleteTest, maxInt) {
   EXPECT_FALSE(fa.isComplete());
   EXPECT_TRUE(complete.isComplete());
 }
+// TEST(AutomatonCreateCompleteTest, alreadySinkState) {
+//   fa::Automaton fa;
+//   fa.addState(0);
+//   fa.addState(1);
+//   fa.addSymbol('a');
+//
+// }
 
 // Tests for createComplement()
 TEST(AutomatonCreateComplementTest, deterministicComplete) {
@@ -1721,7 +1728,6 @@ TEST(AutomatonIsIncludedInTest, nonEmptyLanguage) {
 
   EXPECT_TRUE(fa.isIncludedIn(fa2));
 }
-// Check if fails
 TEST(AutomatonIsIncludedInTest, includedIn) {
   fa::Automaton fa;
   fa.addState(0);
@@ -1770,6 +1776,18 @@ TEST(AutomatonIsIncludedInTest, specialCase) {
 
   EXPECT_FALSE(fa.isIncludedIn(fa2));
 }
+TEST(AutomatonIsIncludedInTest, emptyInEmpty) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+
+  fa::Automaton fa2;
+  fa2.addState(0);
+  fa2.addSymbol('a');
+
+  EXPECT_TRUE(fa.isIncludedIn(fa2));
+  EXPECT_TRUE(fa2.isIncludedIn(fa));
+}
 
 // Tests for createMinimalMoore()
 TEST(AutomatonCreateMinimalMooreTest, emptyAutomaton) {
@@ -1811,6 +1829,7 @@ TEST(AutomatonCreateMinimalBrzozowskiTest, emptyAutomaton) {
   EXPECT_TRUE(minimal.isIncludedIn(fa) && fa.isIncludedIn(minimal));
   EXPECT_TRUE(minimal.isDeterministic());
   EXPECT_TRUE(minimal.isComplete());
+  EXPECT_EQ(minimal.countStates(), 1u);
 }
 TEST(AutomatonCreateMinimalBrzozowskiTest, alreadyMinimal) {
   fa::Automaton fa;
