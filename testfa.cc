@@ -1805,8 +1805,12 @@ TEST(AutomatonCreateMinimalBrzozowskiTest, emptyAutomaton) {
 
   fa::Automaton minimal = fa::Automaton::createMinimalBrzozowski(fa);
 
+  // minimal.prettyPrint(std::cout);
+
   EXPECT_TRUE(minimal.isLanguageEmpty());
   EXPECT_TRUE(minimal.isIncludedIn(fa) && fa.isIncludedIn(minimal));
+  EXPECT_TRUE(minimal.isDeterministic());
+  EXPECT_TRUE(minimal.isComplete());
 }
 TEST(AutomatonCreateMinimalBrzozowskiTest, alreadyMinimal) {
   fa::Automaton fa;
@@ -1823,6 +1827,8 @@ TEST(AutomatonCreateMinimalBrzozowskiTest, alreadyMinimal) {
   EXPECT_TRUE(minimal.match("aaa") && fa.match("aaa"));
   EXPECT_EQ(minimal.countSymbols(), 1u);
   EXPECT_EQ(minimal.countStates(), 1u);
+  EXPECT_TRUE(minimal.isDeterministic());
+  EXPECT_TRUE(minimal.isComplete());
 }
 
 
