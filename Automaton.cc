@@ -433,15 +433,39 @@ namespace fa {
 
     fa::Automaton complete = automaton;
 
-    // creation of the sink state
-    int sinkState = static_cast<int>(automaton.countStates()) + 1;
-    while(complete.hasState(sinkState)) {
-      ++sinkState;
+    int sinkState = -1;
+
+    // Attempt to find a sink state in the automaton
+    for (const auto& state : automaton.states) {
+      // sink state has been found in condition that it has no exiting transitions
+      if (state.second.transitions.empty()) {
+        sinkState = state.first;
+        break;
+      }
+      for (const auto& symbol : state.second.transitions) {
+        for (int arrivalState : symbol.second) {
+          if (arrivalState == sinkState) {
+            sinkState = state.first;
+          } else {
+            sinkState = -1;
+          }
+        }
+      }
     }
+
+    if (sinkState == -1) {
+      // creation of the sink state
+      sinkState = static_cast<int>(automaton.countStates()) + 1;
+      while(complete.hasState(sinkState)) {
+        ++sinkState;
+      }
+    }
+    // Adding missing transitions to self to make automaton complete
     complete.addState(sinkState);
     for (const char symbol : automaton.symbols) {
       complete.addTransition(sinkState, symbol, sinkState);
     }
+
 
     for (auto& state : complete.states) {
       if (state.second.transitions.size() != complete.symbols.size()) {
@@ -664,9 +688,6 @@ namespace fa {
     minimal = createDeterministic(minimal);
 
     minimal = createComplete(minimal); // Could require this line
-
-    minimal.removeNonAccessibleStates();
-    minimal.removeNonCoAccessibleStates();
 
     return minimal;
   }
