@@ -1823,7 +1823,21 @@ TEST(AutomatonCreateMinimalBrzozowskiTest, emptyAutomaton) {
 
   fa::Automaton minimal = fa::Automaton::createMinimalBrzozowski(fa);
 
-  // minimal.prettyPrint(std::cout);
+  EXPECT_TRUE(minimal.isLanguageEmpty());
+  EXPECT_TRUE(minimal.isIncludedIn(fa) && fa.isIncludedIn(minimal));
+  EXPECT_TRUE(minimal.isDeterministic());
+  EXPECT_TRUE(minimal.isComplete());
+  EXPECT_EQ(minimal.countStates(), 1u);
+}
+TEST(AutomatonCreateMinimalBrzozowskiTest, singleState) {
+  // Test the capacity of finding a sink state even if it has transitions to self already
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.addSymbol('a');
+  fa.addSymbol('b');
+  fa.addTransition(0, 'a', 0);
+
+  fa::Automaton minimal = fa::Automaton::createMinimalBrzozowski(fa);
 
   EXPECT_TRUE(minimal.isLanguageEmpty());
   EXPECT_TRUE(minimal.isIncludedIn(fa) && fa.isIncludedIn(minimal));
