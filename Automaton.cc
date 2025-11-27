@@ -672,7 +672,6 @@ namespace fa {
     minimal = createDeterministic(minimal);
     minimal = createComplete(minimal);
 
-    // Computation
 
 
     return minimal;
@@ -687,7 +686,7 @@ namespace fa {
     minimal = createMirror(minimal);
     minimal = createDeterministic(minimal);
 
-    minimal = createComplete(minimal); // Could require this line
+    minimal = createComplete(minimal);
 
     return minimal;
   }
