@@ -668,11 +668,90 @@ namespace fa {
 
 
   Automaton Automaton::createMinimalMoore(const Automaton& other) {
-    Automaton minimal = other;
-    minimal = createDeterministic(minimal);
-    minimal = createComplete(minimal);
+    Automaton CD = other;
+    CD = createDeterministic(CD);
+    CD = createComplete(CD);
 
+    // Create initial partition (final : class 1, other : class 0)
+    std::map<int, int> classes;
+    for (auto& state : CD.states) {
+      classes[state.first] = CD.isStateFinal(state.first) ? 1 : 0;
+    }
 
+    bool changed = true;
+
+    while (changed) {
+      changed = false;
+      std::map<int, std::vector<int>> signatures;
+      std::map<std::vector<int>, int> classIDs;
+      int nextClassID = 0;
+
+      for (auto& state : CD.states) {
+        std::vector<int> signature;
+
+        for (auto& symbol : state.second.transitions) { // possible because minimal is complete and deterministic
+          int dest = *symbol.second.begin();
+          signature.push_back(classes[dest]);
+        }
+
+        signature.push_back(CD.isStateFinal(state.first) ? 1 : 0);
+        signatures[state.first] = signature;
+      }
+
+      std::map<int, int> newClasses;
+      for (auto& signature : signatures) {
+        if (!classIDs.count(signature.second)) {
+          classIDs[signature.second] = nextClassID++;
+        }
+        newClasses[signature.first] = classIDs[signature.second];
+      }
+
+      // Check to see if new iteration is different from previous
+      if (newClasses != classes) {
+        classes = newClasses;
+        changed = true;
+      }
+    }
+
+    Automaton minimal;
+
+    // Add the symbols to new automat
+    for (char symbol : other.symbols) {
+      minimal.addSymbol(symbol);
+    }
+
+    // Clean up the classes
+    std::map<int, int> newStates;
+    for (auto& state : classes) {
+      if (!newStates.count(state.second)) {
+        newStates[state.second] = state.first;
+      }
+    }
+
+    // Create the new states
+    for (auto& state : newStates) {
+      minimal.addState(state.first);
+      // Check if the old state was initial
+      if (CD.isStateInitial(state.second)) {
+        minimal.setStateInitial(state.first);
+      }
+      // Check if the old state was final
+      if (CD.isStateFinal(state.second)) {
+        minimal.setStateFinal(state.first);
+      }
+    }
+
+    // Create the transitions
+    for (auto& state_pairs : newStates) {
+      State &s = minimal.states[state_pairs.first];
+      const State &oldState = CD.states.at(state_pairs.second);
+
+      for (char symbol : minimal.symbols) {
+        int oldDest = *oldState.transitions.at(symbol).begin();
+        int newDest = classes[oldDest];
+        minimal.addTransition(s.state, symbol, newDest);
+      }
+    }
 
     return minimal;
   }
