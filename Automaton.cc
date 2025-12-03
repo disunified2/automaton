@@ -438,19 +438,22 @@ namespace fa {
     // Attempt to find a sink state in the automaton
     for (const auto& state : automaton.states) {
       // sink state has been found in condition that it has no exiting transitions
-      if (state.second.transitions.empty()) {
+      if (!state.second.isFinal) {
+        if (state.second.transitions.empty()) {
         sinkState = state.first;
         break;
-      }
-      for (const auto& symbol : state.second.transitions) {
-        for (int arrivalState : symbol.second) {
-          if (arrivalState == sinkState) {
-            sinkState = state.first;
-          } else {
-            sinkState = -1;
+        }
+        for (const auto& symbol : state.second.transitions) {
+          for (int arrivalState : symbol.second) {
+            if (arrivalState == sinkState) {
+              sinkState = state.first;
+            } else {
+              sinkState = -1;
+            }
           }
         }
       }
+
     }
 
     if (sinkState == -1) {
@@ -596,10 +599,6 @@ namespace fa {
   }
 
   Automaton Automaton::createDeterministic(const Automaton& other) {
-    if (other.isDeterministic()) {
-      return other;
-    }
-
     Automaton deterministic;
 
     for (const char symbol : other.symbols) {
@@ -669,6 +668,7 @@ namespace fa {
 
   Automaton Automaton::createMinimalMoore(const Automaton& other) {
     Automaton CD = other;
+    CD.removeNonAccessibleStates();
     CD = createDeterministic(CD);
     CD = createComplete(CD);
 
@@ -758,6 +758,7 @@ namespace fa {
 
   Automaton Automaton::createMinimalBrzozowski(const Automaton& other) {
     Automaton minimal = other;
+    minimal.removeNonAccessibleStates();
 
     minimal = createMirror(minimal);
     minimal = createDeterministic(minimal);
