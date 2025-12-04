@@ -484,8 +484,8 @@ namespace fa {
 
   Automaton Automaton::createComplement(const Automaton& automaton) {
     Automaton complement = automaton;
-    complement = createDeterministic(complement);
-    complement = createComplete(complement);
+    if (!complement.isDeterministic()) { complement = createDeterministic(complement); }
+    if (!complement.isComplete()) { complement = createComplete(complement); }
 
     for (const auto& state : complement.states) {
       complement.states.at(state.first).isFinal = !complement.states.at(state.first).isFinal;
