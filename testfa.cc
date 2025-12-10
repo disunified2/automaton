@@ -986,6 +986,15 @@ TEST(AutomatonIsLanguageEmptyTest, twoInitial) {
   fa.addTransition(1, 'a', 2);
   EXPECT_FALSE(fa.isLanguageEmpty());
 }
+TEST(AutomatonIsLanguageEmptyTest, initialFinal) {
+  fa::Automaton fa;
+  fa.addState(0);
+  fa.setStateInitial(0);
+  fa.setStateFinal(0);
+  fa.addSymbol('a');
+
+  EXPECT_FALSE(fa.isLanguageEmpty());
+}
 
 // Tests for removeNonAccessibleStates()
 TEST(AutomatonRemoveNonAccessibleStatesTest, noInitialState) {
@@ -1499,6 +1508,26 @@ TEST(AutomatonCreateIntersectionTest, noCommonSymbols) {
 
   fa::Automaton intersection = fa::Automaton::createIntersection(fa1, fa2);
   EXPECT_TRUE(intersection.isLanguageEmpty());
+}
+TEST(AutomatonCreateIntersectionTest, noSymbolsEpsilon) {
+  fa::Automaton fa1;
+  fa1.addState(0);
+  fa1.setStateInitial(0);
+  fa1.setStateFinal(0);
+  fa1.addSymbol('a');
+  fa1.addTransition(0, 'a', 0);
+
+  fa::Automaton fa2;
+  fa2.addState(0);
+  fa2.setStateInitial(0);
+  fa2.setStateFinal(0);
+  fa2.addSymbol('b');
+  fa2.addTransition(0, 'b', 0);
+
+  fa::Automaton intersection = fa::Automaton::createIntersection(fa1, fa2);
+
+  EXPECT_FALSE(intersection.isLanguageEmpty());
+  EXPECT_TRUE(intersection.match(""));
 }
 
 // Tests for hasEmptyIntersectionWith()

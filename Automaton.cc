@@ -372,6 +372,9 @@ namespace fa {
         }
       }
     }
+    if (match("")) {
+      return false;
+    }
     return true;
   }
 
@@ -515,6 +518,12 @@ namespace fa {
     if (shared_symbols.empty()) {
       intersection.addState(0);
       intersection.addSymbol('a');
+
+      if (lhs.match("") && rhs.match("")) {
+        intersection.setStateInitial(0);
+        intersection.setStateFinal(0);
+      }
+
       return intersection;
     }
 
